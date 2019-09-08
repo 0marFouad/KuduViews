@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SCC-processors.iml" filepath="$PROJECT_DIR$/SCC-processors.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nifi-demo-nar/nifi-demo-nar.iml" filepath="$PROJECT_DIR$/nifi-demo-nar/nifi-demo-nar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nifi-demo-processors/nifi-demo-processors.iml" filepath="$PROJECT_DIR$/nifi-demo-processors/nifi-demo-processors.iml" />
+    </modules>
+  </component>
+</project>

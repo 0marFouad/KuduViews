@@ -1,0 +1,6 @@
+scc/processors/demo/View.class
+scc/processors/demo/TransTerm.class
+scc/processors/demo/PutMaterializedToKudu.class
+scc/processors/demo/OperationType.class
+scc/processors/demo/PutMaterializedToKudu$1.class
+scc/processors/demo/TestMain.class
