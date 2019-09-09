@@ -18,38 +18,47 @@ import java.sql.*;
 
 public class Customer_Merch extends View {
 
+    private final static String kuduTableName = "customer-merchant";
+
     Customer_Merch(KuduClient kuduClient, String hiveConnectionURL){ super(kuduClient, hiveConnectionURL); }
 
-    static int getTransactionCount(KuduClient client, String tableName, int terminalId) throws KuduException {
-        KuduTable table = client.openTable(tableName);
-
+    static int getTransactionVal(KuduClient client, Integer custId, Integer merchId, String colName) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
         KuduScanner scanner = client.newScannerBuilder(table)
                 .build();
-//        while (scanner.hasMoreRows()) {
-//            RowResultIterator results = scanner.nextRows();
-//            while (results.hasNext()) {
-//                RowResult result = results.next();
-//                if(result.getInt(0) == terminalId)
-//                    return result.getInt(1);
-//            }
-//        }
+
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                if(result.getInt("MERCHID") == merchId && result.getInt("CUSTID") == custId)
+                    return result.getInt(colName);
+            }
+        }
         return 0;
     }
 
-    static void updateRow(KuduClient client, String tableName, int keyValue, int newTransCount) throws KuduException {
-        KuduTable table = client.openTable(tableName);
-        KuduSession session = client.newSession();
-//        Update update = table.newUpdate();
-//        update.getRow().addInt("TERMID", keyValue);
-//        update.getRow().addInt("TRANSCOUNT", newTransCount);
-//        session.apply(update);
+    static int lastID(KuduClient client, String colName) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduScanner scanner = client.newScannerBuilder(table)
+                .build();
+        int maxId = 0;
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                maxId = Math.max(result.getInt(" , merchId,ID"), maxId);
+            }
+        }
+        return maxId;
     }
 
-    static void insertRow(KuduClient client, String tableName, Integer custId, String custName, Integer merchId, String merchName, Integer transAmt) throws KuduException {
+    static void insertRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Integer transAmt, Integer id) throws KuduException {
         // Open the newly-created table and create a KuduSession.
-        KuduTable table = client.openTable(tableName);
+        KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Insert insert = table.newInsert();
+        insert.getRow().addInt("ID", id);
         insert.getRow().addInt("CUSTID", custId);
         insert.getRow().addString("CUSTNAME", custName);
         insert.getRow().addInt("MERCHID", merchId);
@@ -57,6 +66,19 @@ public class Customer_Merch extends View {
         insert.getRow().addInt("TRANSAMT", transAmt);
         session.apply(insert);
         session.close();
+    }
+
+    static void updateRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Integer transAmt, Integer id) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduSession session = client.newSession();
+        Update update = table.newUpdate();
+        update.getRow().addInt("ID", id);
+        update.getRow().addInt("CUSTID", custId);
+        update.getRow().addString("CUSTNAME", custName);
+        update.getRow().addInt("MERCHID", merchId);
+        update.getRow().addString("MERCHNAME", merchName);
+        update.getRow().addInt("TRANSAMT", transAmt);
+        session.apply(update);
     }
 
     @Override
@@ -105,10 +127,15 @@ public class Customer_Merch extends View {
             rs.next();
             merchName = rs.getString("name");
 
-            // Insert the row
-            Integer oldTransAmt = getTransactionCount(kuduClient, tableName, terminalId);
-            insertRow(kuduClient, tableName, custId, custName, merchId, merchName, transAmt);
-
+            Integer oldTransAmt = getTransactionVal(kuduClient, custId, merchId, "TRANSAMT");
+            Integer kuduId = getTransactionVal(kuduClient, custId, merchId, "ID");
+            Integer lastId = lastID(kuduClient, "ID");
+            if(oldTransAmt == 0){
+                insertRow(kuduClient, custId, custName, merchId, merchName, transAmt, lastId);
+            }
+            else {
+                updateRow(kuduClient, custId, custName, merchId, merchName, (oldTransAmt + transAmt), kuduId);
+            }
         }
     }
 
