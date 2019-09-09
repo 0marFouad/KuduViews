@@ -77,7 +77,6 @@ public class TransTerm extends View {
             rs.next();
             terminalId = rs.getInt("TERM_ID");
 
-
             //find entry of same terminal_id in Kudu and store Number of transactions
             int transactionCount = getTransactionCount(kuduClient,tableName,terminalId);
             //Create new statement with inserting in kudu Number of transactions + 1
