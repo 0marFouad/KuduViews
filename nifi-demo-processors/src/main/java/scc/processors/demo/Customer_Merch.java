@@ -140,12 +140,12 @@ public class Customer_Merch extends View {
     }
 
     @Override
-    public void handleDeletion() {
+    public void handleDeletion(FlowFile flowFile) throws Exception {
 
     }
 
     @Override
-    public void handleUpdate() {
+    public void handleUpdate(FlowFile flowFile) throws Exception {
 
     }
 }
