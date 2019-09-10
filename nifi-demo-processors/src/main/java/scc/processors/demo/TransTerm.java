@@ -82,11 +82,11 @@ public class TransTerm extends View {
         }
     }
 
-    public void handleDeletion(){
+    public void handleDeletion(FlowFile flowFile){
         System.out.println("Deletion Goes Here");
     }
 
-    public void handleUpdate(){
+    public void handleUpdate(FlowFile flowFile){
         System.out.println("Update Goes Here");
     }
 }
