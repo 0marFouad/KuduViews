@@ -19,12 +19,12 @@ public class BankMerchant extends View {
     }
 
     @Override
-    public void handleDeletion() {
+    public void handleDeletion(FlowFile flowFile) {
 
     }
 
     @Override
-    public void handleUpdate() {
+    public void handleUpdate(FlowFile flowFile) {
 
     }
 }

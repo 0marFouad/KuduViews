@@ -31,7 +31,7 @@ public class BankCustomer extends View {
                     Update update = table.newUpdate();
                     update.getRow().addString("TIME",reg_date);
                     update.getRow().addInt("BANK_ID", bank_id);
-                    update.getRow().addInt("ID", result.getInt("ID"));
+                    update.getRow().addString("ID", result.getString("ID"));
                     update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") + 1);
                     session.apply(update);
                     session.close();
@@ -39,7 +39,11 @@ public class BankCustomer extends View {
                     Insert insert = table.newInsert();
                     insert.getRow().addString("TIME", reg_date);
                     insert.getRow().addInt("BANK_ID", bank_id);
-                    insert.getRow().addInt("ID", bank_id);
+
+                    Date date= new Date();
+                    Long time = date.getTime();
+
+                    insert.getRow().addString("ID", time.toString());
                     insert.getRow().addInt("CUSTOMERS_NUM", 1);
                     session.apply(insert);
                     session.close();
@@ -59,7 +63,7 @@ public class BankCustomer extends View {
                 RowResult result = results.next();
                 if(result.getInt("BANK_ID") == bank_id && result.getString("REG_DATE").equals(reg_date)){
                     Delete delete = table.newDelete();
-                    delete.getRow().addInt("ID", result.getInt("ID"));
+                    delete.getRow().addString("ID", result.getString("ID"));
                     session.apply(delete);
                     session.close();
                 }
