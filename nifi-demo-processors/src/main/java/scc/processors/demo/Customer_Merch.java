@@ -54,7 +54,6 @@ public class Customer_Merch extends View {
     }
 
     static void insertRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Integer transAmt, Integer id) throws KuduException {
-        // Open the newly-created table and create a KuduSession.
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Insert insert = table.newInsert();
@@ -81,6 +80,14 @@ public class Customer_Merch extends View {
         session.apply(update);
     }
 
+    static void deleteRow(KuduClient client, int id, String colName) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduSession session = client.newSession();
+        Delete delete = table.newDelete();
+        delete.getRow().addInt(colName, id);
+        session.apply(delete);
+    }
+
     @Override
     public void handleInsertion(FlowFile flowFile) throws Exception {
         String databaseName = flowFile.getAttribute("database_name");
@@ -91,7 +98,6 @@ public class Customer_Merch extends View {
         if(tableName == "transactions"){
             //set KuduTable
             KuduTable table = kuduClient.openTable(tableName);
-            Schema schema = table.getSchema();
             Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
 
             // Selecting in transactions table
@@ -144,9 +150,24 @@ public class Customer_Merch extends View {
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String keyValue = flowFile.getAttribute("primary_key");
-        Integer terminalId, transAmt, cardId, custId, merchId;
-        String custName = "", merchName = "";
-        if(tableName == "")
+        String[] values = flowFile.getAttribute("new_values").split(",");
+        int id = Integer.parseInt(values[0]);
+        if(tableName == "merchants")
+        {
+            //set KuduTable
+            KuduTable table = kuduClient.openTable(tableName);
+
+            // Deleting the row
+            deleteRow(kuduClient, id, "MERCHID");
+        }
+        else if(tableName == "customers")
+        {
+            //set KuduTable
+            KuduTable table = kuduClient.openTable(tableName);
+
+            // Deleting the row
+            deleteRow(kuduClient, id, "CUSTID");
+        }
     }
 
     @Override
