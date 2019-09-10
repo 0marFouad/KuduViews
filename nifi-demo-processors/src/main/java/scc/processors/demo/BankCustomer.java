@@ -2,6 +2,8 @@ package scc.processors.demo;
 
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -63,8 +65,6 @@ public class BankCustomer extends View {
                 }
             }
         }
-
-
     }
 
     @Override
@@ -73,19 +73,23 @@ public class BankCustomer extends View {
         String[] new_values = flowFile.getAttribute("new_values").split(",");
         int bank_id = Integer.parseInt(new_values[3]);
         String reg_date = new_values[1];
+        SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentYear = Integer.toString(formatter.parse(reg_date).getYear());
         if(tableName.toLowerCase().equals("cards")){
-            insertRow(bank_id, reg_date);
+            insertRow(bank_id, currentYear);
         }
     }
 
     @Override
-    public void handleDeletion(FlowFile flowFile) throws KuduException {
+    public void handleDeletion(FlowFile flowFile) throws Exception {
         String tableName = flowFile.getAttribute("table_name");
         String[] values = flowFile.getAttribute("new_values").split(",");
         int bank_id = Integer.parseInt(values[3]);
         String reg_date = values[1];
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentYear = Integer.toString(formatter.parse(reg_date).getYear());
         if(tableName.toLowerCase().equals("cards")){
-            deleteRow(bank_id, reg_date);
+            deleteRow(bank_id, currentYear);
         }
     }
 
