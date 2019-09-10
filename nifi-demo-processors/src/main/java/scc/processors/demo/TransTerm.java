@@ -70,7 +70,6 @@ public class TransTerm extends View {
             String recordDate = (rs.getTimestamp("RECORD_DATE").getMonth() + 1)+ "-" + (rs.getTimestamp("RECORD_DATE").getYear() + 1900);
 
 
-
             //find entry of same terminal_id in Kudu and store Number of transactions
             int transactionCount = getTransactionCount(kuduClient,terminalId,recordDate);
             //Create new statement with inserting in kudu Number of transactions + 1
@@ -83,11 +82,11 @@ public class TransTerm extends View {
         }
     }
 
-    public void handleDeletion(){
+    public void handleDeletion(FlowFile flowFile){
         System.out.println("Deletion Goes Here");
     }
 
-    public void handleUpdate(){
+    public void handleUpdate(FlowFile flowFile){
         System.out.println("Update Goes Here");
     }
 }

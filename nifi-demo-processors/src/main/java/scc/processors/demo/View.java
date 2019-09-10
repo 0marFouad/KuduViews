@@ -16,19 +16,19 @@ abstract class View{
 
     public abstract void handleInsertion(FlowFile flowFile) throws Exception;
 
-    public abstract void handleDeletion();
+    public abstract void handleDeletion(FlowFile flowFile) throws Exception;
 
-    public abstract void handleUpdate();
+    public abstract void handleUpdate(FlowFile flowFile) throws Exception;
 
     public final  void execute(String type,FlowFile flowFile) throws Exception{
         if(type.equals("insert")){
             handleInsertion(flowFile);
         }
         if(type.equals("delete")){
-            handleDeletion();
+            handleDeletion(flowFile);
         }
         if(type.equals("update")){
-            handleUpdate();
+            handleUpdate(flowFile);
         }
     }
 }
