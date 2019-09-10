@@ -4,9 +4,10 @@ package scc.processors.demo;
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
 import java.sql.*;
+import java.util.List;
+
 
 public class TransTerm extends View {
-
     private final static String kuduTableName = "views::transaction-terminal";
 
     TransTerm(KuduClient kuduClient, String hiveConnectionURL){
@@ -22,24 +23,59 @@ public class TransTerm extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt(1) == terminalId && result.getString(0).equals(recordDate))
-                    return result.getInt(2);
+                if(result.getInt("TERMID") == terminalId && result.getString("TIME").equals(recordDate))
+                    return result.getInt("TRANSCOUNT");
             }
         }
         return 0;
     }
 
-    static void updateRow(KuduClient client,String timestamp, int keyValue, int newTransCount) throws KuduException {
+    static int getRowId(KuduClient client, int terminalId, String recordDate) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduScanner scanner = client.newScannerBuilder(table)
+                .build();
+
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                if(result.getInt("TERMID") == terminalId && result.getString("TIME").equals(recordDate))
+                    return result.getInt("ID");
+            }
+        }
+        return 0;
+    }
+
+
+    static int getMaxID(KuduClient client) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduScanner scanner = client.newScannerBuilder(table)
+                .build();
+
+        int maxId = 0;
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                maxId = Math.max(maxId,result.getInt("ID"));
+            }
+        }
+        return maxId;
+    }
+
+
+    static void updateRow(KuduClient client,String timestamp, int keyValue, int newTransCount, int rowId) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
+        update.getRow().addInt("ID",rowId);
         update.getRow().addString("TIME",timestamp);
         update.getRow().addInt("TERMID", keyValue);
         update.getRow().addInt("TRANSCOUNT", newTransCount);
         session.apply(update);
     }
 
-    static void insertRow(KuduClient client, String timestamp, int keyValue) throws KuduException {
+    static void insertRow(KuduClient client, String timestamp, int keyValue, int rowId) throws KuduException {
         // Open the newly-created table and create a KuduSession.
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
@@ -47,6 +83,7 @@ public class TransTerm extends View {
         insert.getRow().addString("TIME", timestamp);
         insert.getRow().addInt("TERMID", keyValue);
         insert.getRow().addInt("TRANSCOUNT", 1);
+        insert.getRow().addInt("ID", rowId);
         session.apply(insert);
         session.close();
     }
@@ -73,18 +110,19 @@ public class TransTerm extends View {
 
             //find entry of same terminal_id in Kudu and store Number of transactions
             int transactionCount = getTransactionCount(kuduClient,terminalId,recordDate);
+            int rowId = getRowId(kuduClient,terminalId,recordDate);
             //Create new statement with inserting in kudu Number of transactions + 1
             if(transactionCount == 0){
-                insertRow(kuduClient,recordDate,terminalId);
+                insertRow(kuduClient,recordDate,terminalId,getMaxID(kuduClient));
             }else{
-                updateRow(kuduClient,recordDate,terminalId,transactionCount+1);
+                updateRow(kuduClient,recordDate,terminalId,transactionCount+1,rowId);
             }
 
         }
     }
 
     public void handleDeletion(){
-        System.out.println("Deletion Goes Here");
+
     }
 
     public void handleUpdate(){
