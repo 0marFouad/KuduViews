@@ -141,7 +141,12 @@ public class Customer_Merch extends View {
 
     @Override
     public void handleDeletion(FlowFile flowFile) throws Exception {
-
+        String databaseName = flowFile.getAttribute("database_name");
+        String tableName = flowFile.getAttribute("table_name");
+        String keyValue = flowFile.getAttribute("primary_key");
+        Integer terminalId, transAmt, cardId, custId, merchId;
+        String custName = "", merchName = "";
+        if(tableName == "")
     }
 
     @Override
