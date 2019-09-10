@@ -2,6 +2,8 @@ package scc.processors.demo;
 
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,7 +31,7 @@ public class BankCustomer extends View {
                     Update update = table.newUpdate();
                     update.getRow().addString("TIME",reg_date);
                     update.getRow().addInt("BANK_ID", bank_id);
-                    update.getRow().addInt("ID", result.getInt("ID"));
+                    update.getRow().addString("ID", result.getString("ID"));
                     update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") + 1);
                     session.apply(update);
                     session.close();
@@ -37,7 +39,11 @@ public class BankCustomer extends View {
                     Insert insert = table.newInsert();
                     insert.getRow().addString("TIME", reg_date);
                     insert.getRow().addInt("BANK_ID", bank_id);
-                    insert.getRow().addInt("ID", bank_id);
+
+                    Date date= new Date();
+                    Long time = date.getTime();
+
+                    insert.getRow().addString("ID", time.toString());
                     insert.getRow().addInt("CUSTOMERS_NUM", 1);
                     session.apply(insert);
                     session.close();
@@ -57,14 +63,12 @@ public class BankCustomer extends View {
                 RowResult result = results.next();
                 if(result.getInt("BANK_ID") == bank_id && result.getString("REG_DATE").equals(reg_date)){
                     Delete delete = table.newDelete();
-                    delete.getRow().addInt("ID", result.getInt("ID"));
+                    delete.getRow().addString("ID", result.getString("ID"));
                     session.apply(delete);
                     session.close();
                 }
             }
         }
-
-
     }
 
     @Override
@@ -73,19 +77,23 @@ public class BankCustomer extends View {
         String[] new_values = flowFile.getAttribute("new_values").split(",");
         int bank_id = Integer.parseInt(new_values[3]);
         String reg_date = new_values[1];
+        SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentYear = Integer.toString(formatter.parse(reg_date).getYear());
         if(tableName.toLowerCase().equals("cards")){
-            insertRow(bank_id, reg_date);
+            insertRow(bank_id, currentYear);
         }
     }
 
     @Override
-    public void handleDeletion(FlowFile flowFile) throws KuduException {
+    public void handleDeletion(FlowFile flowFile) throws Exception {
         String tableName = flowFile.getAttribute("table_name");
         String[] values = flowFile.getAttribute("new_values").split(",");
         int bank_id = Integer.parseInt(values[3]);
         String reg_date = values[1];
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentYear = Integer.toString(formatter.parse(reg_date).getYear());
         if(tableName.toLowerCase().equals("cards")){
-            deleteRow(bank_id, reg_date);
+            deleteRow(bank_id, currentYear);
         }
     }
 
