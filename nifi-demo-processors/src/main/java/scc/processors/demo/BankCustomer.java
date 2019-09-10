@@ -47,30 +47,43 @@ public class BankCustomer extends View {
         }
 
     }
-    private void deleteRow(int bank_id, String reg_date) {
+    private void deleteRow(int bank_id, String reg_date) throws KuduException {
+        KuduTable table = kuduClient.openTable(kuduTableName);
+        KuduScanner scanner = kuduClient.newScannerBuilder(table).build();
+        KuduSession session = kuduClient.newSession();
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                if(result.getInt("BANK_ID") == bank_id && result.getString("REG_DATE").equals(reg_date)){
+                    Delete delete = table.newDelete();
+                    delete.getRow().addInt("ID", result.getInt("ID"));
+                    session.apply(delete);
+                    session.close();
+                }
+            }
+        }
+
 
     }
 
     @Override
     public void handleInsertion(FlowFile flowFile) throws Exception {
-//        String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
-//        String keyValue = flowFile.getAttribute("primary_key");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
-        int bank_id = Integer.parseInt(new_values[1]);
-        String reg_date = new_values[2];
+        int bank_id = Integer.parseInt(new_values[3]);
+        String reg_date = new_values[1];
         if(tableName.toLowerCase().equals("cards")){
             insertRow(bank_id, reg_date);
         }
     }
 
     @Override
-    public void handleDeletion(FlowFile flowFile) {
+    public void handleDeletion(FlowFile flowFile) throws KuduException {
         String tableName = flowFile.getAttribute("table_name");
-//        String keyValue = flowFile.getAttribute("primary_key");
-        String[] new_values = flowFile.getAttribute("new_values").split(",");
-        int bank_id = Integer.parseInt(new_values[1]);
-        String reg_date = new_values[2];
+        String[] values = flowFile.getAttribute("new_values").split(",");
+        int bank_id = Integer.parseInt(values[3]);
+        String reg_date = values[1];
         if(tableName.toLowerCase().equals("cards")){
             deleteRow(bank_id, reg_date);
         }
