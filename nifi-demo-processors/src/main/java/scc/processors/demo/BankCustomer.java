@@ -79,7 +79,7 @@ public class BankCustomer extends View {
 
 
     @Override
-    public void handleUpdate() {
+    public void handleUpdate(FlowFile flowFile) {
 
     }
 }
