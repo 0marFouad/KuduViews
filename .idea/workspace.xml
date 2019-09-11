@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a00b5021-bfe2-4fbe-b4af-7393e1e2ae6c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java" beforeDir="false" afterPath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java" beforeDir="false" afterPath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -32,12 +32,14 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="29" column="5" lean-forward="true" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
+            <state relative-caret-position="-68">
+              <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#307#308#0" expanded="true" />
                 <element signature="e#359#360#0" expanded="true" />
+                <element signature="e#3533#3534#0" expanded="true" />
+                <element signature="e#3589#3590#0" expanded="true" />
                 <element signature="e#3605#3606#0" expanded="true" />
                 <element signature="e#3659#3660#0" expanded="true" />
               </folding>
@@ -45,11 +47,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1012">
-              <caret line="167" column="43" selection-start-line="167" selection-start-column="43" selection-end-line="167" selection-end-column="43" />
+            <state relative-caret-position="319">
+              <caret line="227" selection-start-line="227" selection-end-line="227" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -57,23 +59,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
-              <caret line="39" selection-start-line="39" selection-end-line="39" />
+            <state relative-caret-position="424">
+              <caret line="214" column="9" lean-forward="true" selection-start-line="214" selection-start-column="9" selection-end-line="214" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -87,6 +80,7 @@
       <find>keyValue</find>
       <find>insertRow</find>
       <find>update</find>
+      <find>trans</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -102,6 +96,7 @@
         <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java" />
         <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankCustomer.java" />
         <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java" />
+        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java" />
       </list>
     </option>
   </component>
@@ -246,7 +241,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11991000" />
+    <option name="totallyTimeSpent" value="35048000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1366" height="743" extended-state="6" />
@@ -257,9 +252,10 @@
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.26177174" />
+      <window_info content_ui="combo" id="Project" order="5" visible="true" weight="0.26177174" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="0" sideWeight="0.4997233" weight="0.32789558" />
+      <window_info anchor="bottom" id="Duplicates" weight="0.32899022" />
+      <window_info anchor="bottom" id="Terminal" order="0" sideWeight="0.4997233" weight="0.32736155" />
       <window_info anchor="bottom" id="Event Log" order="1" sideWeight="0.5002767" side_tool="true" weight="0.32785088" />
       <window_info anchor="bottom" id="Version Control" order="2" />
       <window_info anchor="bottom" id="Message" order="3" />
@@ -331,27 +327,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="29" column="5" lean-forward="true" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#307#308#0" expanded="true" />
-            <element signature="e#359#360#0" expanded="true" />
-            <element signature="e#3605#3606#0" expanded="true" />
-            <element signature="e#3659#3660#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankMerchant.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -366,6 +341,56 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="427">
           <caret line="83" column="5" selection-start-line="83" selection-start-column="5" selection-end-line="83" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-68">
+          <caret line="60" lean-forward="true" selection-start-line="60" selection-end-line="60" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#307#308#0" expanded="true" />
+            <element signature="e#359#360#0" expanded="true" />
+            <element signature="e#3533#3534#0" expanded="true" />
+            <element signature="e#3589#3590#0" expanded="true" />
+            <element signature="e#3605#3606#0" expanded="true" />
+            <element signature="e#3659#3660#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/lib/jvm/java-8-oracle/src.zip!/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="110" column="19" selection-start-line="110" selection-start-column="19" selection-end-line="110" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="227" selection-start-line="227" selection-end-line="227" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="424">
+          <caret line="214" column="9" lean-forward="true" selection-start-line="214" selection-start-column="9" selection-end-line="214" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

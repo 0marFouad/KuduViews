@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.sql.*;
 
 
@@ -22,7 +23,7 @@ public class Customer_Merch extends View {
 
     Customer_Merch(KuduClient kuduClient, String hiveConnectionURL){ super(kuduClient, hiveConnectionURL); }
 
-    static int getTransactionVal(KuduClient client, Integer custId, Integer merchId, String colName) throws KuduException {
+    static Double getTransactionVal(KuduClient client, Integer custId, Integer merchId, String colName) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduScanner scanner = client.newScannerBuilder(table)
                 .build();
@@ -32,60 +33,83 @@ public class Customer_Merch extends View {
             while (results.hasNext()) {
                 RowResult result = results.next();
                 if(result.getInt("MERCHID") == merchId && result.getInt("CUSTID") == custId)
-                    return result.getInt(colName);
+                    return result.getDouble(colName);
             }
         }
-        return 0;
+        return Double.valueOf(0);
     }
 
-    static int lastID(KuduClient client, String colName) throws KuduException {
+    static String getId(KuduClient client, Integer custId, Integer merchId) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduScanner scanner = client.newScannerBuilder(table)
                 .build();
-        int maxId = 0;
+
         while (scanner.hasMoreRows()) {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                maxId = Math.max(result.getInt(" , merchId,ID"), maxId);
+                if(result.getInt("MERCHID") == merchId && result.getInt("CUSTID") == custId)
+                    return result.getString("ID");
             }
         }
-        return maxId;
+        return "";
     }
 
-    static void insertRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Integer transAmt, Integer id) throws KuduException {
+    static void insertRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Double transAmt, String id) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Insert insert = table.newInsert();
-        insert.getRow().addInt("ID", id);
+        insert.getRow().addString("ID", id);
         insert.getRow().addInt("CUSTID", custId);
         insert.getRow().addString("CUSTNAME", custName);
         insert.getRow().addInt("MERCHID", merchId);
         insert.getRow().addString("MERCHNAME", merchName);
-        insert.getRow().addInt("TRANSAMT", transAmt);
+        insert.getRow().addDouble("TRANSAMT", transAmt);
         session.apply(insert);
         session.close();
     }
 
-    static void updateRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Integer transAmt, Integer id) throws KuduException {
+    static void updateRow(KuduClient client, Integer custId, String custName, Integer merchId, String merchName, Double transAmt, String id) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
-        update.getRow().addInt("ID", id);
+        update.getRow().addString("ID", id);
         update.getRow().addInt("CUSTID", custId);
         update.getRow().addString("CUSTNAME", custName);
         update.getRow().addInt("MERCHID", merchId);
         update.getRow().addString("MERCHNAME", merchName);
-        update.getRow().addInt("TRANSAMT", transAmt);
+        update.getRow().addDouble("TRANSAMT", transAmt);
         session.apply(update);
     }
 
-    static void deleteRow(KuduClient client, int id, String colName) throws KuduException {
+    static void deleteRow(KuduClient client, String id, String colName) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Delete delete = table.newDelete();
-        delete.getRow().addInt(colName, id);
+        delete.getRow().addString(colName, id);
         session.apply(delete);
+    }
+
+    static void deleteRows(KuduClient client, Integer merchId, Integer custId) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduScanner scanner = client.newScannerBuilder(table)
+                .build();
+        KuduSession session = client.newSession();
+        Delete delete = table.newDelete();
+        String id = "";
+
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                if(result.getInt("MERCHID") == merchId && result.getInt("CUSTID") == custId)
+                {
+                    id = result.getString("ID");
+                    delete.getRow().addString("ID", id);
+                    session.apply(delete);
+                }
+            }
+        }
     }
 
     @Override
@@ -93,9 +117,12 @@ public class Customer_Merch extends View {
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String keyValue = flowFile.getAttribute("primary_key");
-        Integer terminalId, transAmt, cardId, custId, merchId;
+        Integer terminalId, cardId, custId, merchId;
+        Double transAmt;
         String custName = "", merchName = "";
-        if(tableName == "transactions"){
+
+        if(tableName.equals("transactions")){
+
             //set KuduTable
             KuduTable table = kuduClient.openTable(tableName);
             Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
@@ -106,7 +133,7 @@ public class Customer_Merch extends View {
             ResultSet rs = st.executeQuery(query);
             rs.next();
             terminalId = rs.getInt("TERM_ID");
-            transAmt = rs.getInt("TRAN_AMOUNT");
+            transAmt = Double.valueOf(rs.getInt("TRAN_AMOUNT"));
             cardId = rs.getInt("CARD_ID");
 
             // Selecting from cards table and extracting customer id
@@ -133,11 +160,14 @@ public class Customer_Merch extends View {
             rs.next();
             merchName = rs.getString("name");
 
-            Integer oldTransAmt = getTransactionVal(kuduClient, custId, merchId, "TRANSAMT");
-            Integer kuduId = getTransactionVal(kuduClient, custId, merchId, "ID");
-            Integer lastId = lastID(kuduClient, "ID");
-            if(oldTransAmt == 0){
-                insertRow(kuduClient, custId, custName, merchId, merchName, transAmt, lastId);
+            // Getting old transaction amount from kudu table
+            Double oldTransAmt = getTransactionVal(kuduClient, custId, merchId, "TRANSAMT");
+            String kuduId = getId(kuduClient, custId, merchId);
+            if(oldTransAmt == 0 || kuduId.equals("")){
+                Date date= new Date();
+                long time = date.getTime();
+                String id = Long.toString(time);
+                insertRow(kuduClient, custId, custName, merchId, merchName, transAmt, id);
             }
             else {
                 updateRow(kuduClient, custId, custName, merchId, merchName, (oldTransAmt + transAmt), kuduId);
@@ -151,27 +181,111 @@ public class Customer_Merch extends View {
         String tableName = flowFile.getAttribute("table_name");
         String keyValue = flowFile.getAttribute("primary_key");
         String[] values = flowFile.getAttribute("new_values").split(",");
-        int id = Integer.parseInt(values[0]);
-        if(tableName == "merchants")
-        {
-            //set KuduTable
-            KuduTable table = kuduClient.openTable(tableName);
+        Double transAmt = Double.parseDouble(values[1]);
+        Integer terminalId, cardId, custId, merchId;
+        String custName = "", merchName = "", query = "";
 
-            // Deleting the row
-            deleteRow(kuduClient, id, "MERCHID");
-        }
-        else if(tableName == "customers")
-        {
-            //set KuduTable
-            KuduTable table = kuduClient.openTable(tableName);
+        //set KuduTable
+        KuduTable table = kuduClient.openTable(tableName);
+        Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
 
-            // Deleting the row
-            deleteRow(kuduClient, id, "CUSTID");
+        // Selecting in transactions table
+        terminalId = Integer.parseInt(values[2]);
+        cardId = Integer.parseInt(values[3]);
+
+        // Selecting from cards table and extracting customer id
+        Statement st = conn.createStatement();
+        ResultSet rs;
+        query = "select * from cards where id = " + cardId;
+        rs = st.executeQuery(query);
+        rs.next();
+        custId = rs.getInt("cust_id");
+
+        // Selecting from cards table and extracting customer name
+        query = "select * from customers where id = " + custId;
+        rs = st.executeQuery(query);
+        rs.next();
+        custName = rs.getString("name");
+
+        // Selecting from terminals and extracting merchant id
+        query = "select * from terminals where id = " + terminalId;
+        rs = st.executeQuery(query);
+        rs.next();
+        merchId = rs.getInt("merch_id");
+
+        // Selecting from merchants and extracting merchant name
+        query = "select * from merchants where id = " + merchId;
+        rs = st.executeQuery(query);
+        rs.next();
+        merchName = rs.getString("name");
+
+        // old transaction amount in record in kudu
+        Double oldTransAmt = getTransactionVal(kuduClient, custId, merchId, "TRANSAMT");
+        String kuduId = getId(kuduClient, custId, merchId);
+
+        if(tableName.equals("transactions"))
+        {
+            // Update record with the new transaction amount
+            updateRow(kuduClient, custId, custName, merchId, merchName, (oldTransAmt - transAmt), kuduId);
         }
     }
 
     @Override
     public void handleUpdate(FlowFile flowFile) throws Exception {
+        String databaseName = flowFile.getAttribute("database_name");
+        String tableName = flowFile.getAttribute("table_name");
+        String keyValue = flowFile.getAttribute("primary_key");
+        String[] new_values = flowFile.getAttribute("new_values").split(",");
+        String[] old_values = flowFile.getAttribute("old_values").split(",");
+        Double new_transAmt = Double.parseDouble(new_values[1]);
+        Double old_transAmt = Double.parseDouble(old_values[1]);
+        Integer terminalId, cardId, custId, merchId;
+        String custName = "", merchName = "", query = "";
+        String recordDate = new_values[6];
+        //set KuduTable
+        KuduTable table = kuduClient.openTable(tableName);
+        Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
 
+        // Selecting in transactions table
+        terminalId = Integer.parseInt(new_values[2]);
+        cardId = Integer.parseInt(new_values[3]);
+
+        // Selecting from cards table and extracting customer id
+        Statement st = conn.createStatement();
+        ResultSet rs;
+        query = "select * from cards where id = " + cardId;
+        rs = st.executeQuery(query);
+        rs.next();
+        custId = rs.getInt("cust_id");
+
+        // Selecting from cards table and extracting customer name
+        query = "select * from customers where id = " + custId;
+        rs = st.executeQuery(query);
+        rs.next();
+        custName = rs.getString("name");
+
+        // Selecting from terminals and extracting merchant id
+        query = "select * from terminals where id = " + terminalId;
+        rs = st.executeQuery(query);
+        rs.next();
+        merchId = rs.getInt("merch_id");
+
+        // Old transaction amount in record in kudu
+        Double currentTransAmt = getTransactionVal(kuduClient, custId, merchId, "TRANSAMT");
+        Double transAmt = (currentTransAmt - old_transAmt) + new_transAmt;
+        // Retreive table id in kudu
+        String kuduId = getId(kuduClient, custId, merchId);
+
+        // Selecting from merchants and extracting merchant name
+        query = "select * from merchants where id = " + merchId;
+        rs = st.executeQuery(query);
+        rs.next();
+        merchName = rs.getString("name");
+
+        if(tableName == "transactions")
+        {
+            // Deleting the row
+            updateRow(kuduClient, custId, custName, merchId, merchName, transAmt, kuduId);
+        }
     }
 }
