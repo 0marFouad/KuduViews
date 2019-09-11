@@ -11,7 +11,7 @@ public class BanksTransactions extends View{
 
 
 
-    private final static String kuduTableName = "merchant-profit";
+    private final static String kuduTableName = "views::bank-transaction";
 
     private  int total_transaction_amount =0  ;
     private String ID ;
