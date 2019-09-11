@@ -5,8 +5,6 @@ import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
 import java.sql.*;
 import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.List;
 
 
 public class TransTerm extends View {
@@ -16,7 +14,7 @@ public class TransTerm extends View {
         super(kuduClient, hiveConnectionURL);
     }
 
-    static int getTransactionCount(KuduClient client, int terminalId, String recordDate) throws KuduException {
+    private static int getTransactionCount(KuduClient client, int terminalId, String recordDate) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduScanner scanner = client.newScannerBuilder(table)
                 .build();
@@ -32,7 +30,7 @@ public class TransTerm extends View {
         return 0;
     }
 
-    static String getRowId(KuduClient client, int terminalId, String recordDate) throws KuduException {
+    private static String getRowId(KuduClient client, int terminalId, String recordDate) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduScanner scanner = client.newScannerBuilder(table)
                 .build();
@@ -49,24 +47,7 @@ public class TransTerm extends View {
     }
 
 
-    static int getMaxID(KuduClient client) throws KuduException {
-        KuduTable table = client.openTable(kuduTableName);
-        KuduScanner scanner = client.newScannerBuilder(table)
-                .build();
-
-        int maxId = 0;
-        while (scanner.hasMoreRows()) {
-            RowResultIterator results = scanner.nextRows();
-            while (results.hasNext()) {
-                RowResult result = results.next();
-                maxId = Math.max(maxId,result.getInt("ID"));
-            }
-        }
-        return maxId;
-    }
-
-
-    static void updateRow(KuduClient client,String timestamp, int keyValue, int newTransCount, String rowId) throws KuduException {
+    private static void updateRow(KuduClient client,String timestamp, int keyValue, int newTransCount, String rowId) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
@@ -77,7 +58,7 @@ public class TransTerm extends View {
         session.apply(update);
     }
 
-    static void insertRow(KuduClient client, String timestamp, int keyValue, String rowId) throws KuduException {
+    private static void insertRow(KuduClient client, String timestamp, int keyValue, String rowId) throws KuduException {
         // Open the newly-created table and create a KuduSession.
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
@@ -88,25 +69,6 @@ public class TransTerm extends View {
         insert.getRow().addString("ID", rowId);
         session.apply(insert);
         session.close();
-    }
-
-    static void deleteRow(KuduClient client, int terminalId, String recordDate) throws KuduException {
-        KuduTable table = client.openTable(kuduTableName);
-        KuduSession session = client.newSession();
-        KuduScanner scanner = client.newScannerBuilder(table)
-                .build();
-        Delete delete = table.newDelete();
-        while (scanner.hasMoreRows()) {
-            RowResultIterator results = scanner.nextRows();
-            while (results.hasNext()) {
-                RowResult result = results.next();
-                if(result.getInt("ID") == terminalId && result.getString("TIME").equals(recordDate)){
-                    delete.getRow().addString("ID",result.getString("ID"));
-                    session.apply(delete);
-                    return;
-                }
-            }
-        }
     }
 
     public void handleInsertion(FlowFile flowFile) throws Exception{
@@ -146,7 +108,7 @@ public class TransTerm extends View {
         }
     }
 
-    static String[] parseTimestamp(String timestamp){
+    private static String[] parseTimestamp(String timestamp){
         String[] time = new String[2];
         time[1] = timestamp.substring(0,4);
         time[0] = timestamp.substring(5,2);

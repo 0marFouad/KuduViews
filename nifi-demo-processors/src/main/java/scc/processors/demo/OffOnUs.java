@@ -1,93 +1,167 @@
 package scc.processors.demo;
 
-
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
 import java.sql.*;
 
 public class OffOnUs extends View {
 
-    private final static String kuduTableName = "views::off-on-us";
+    private final static String kuduTableName = "off-on-us";
 
     OffOnUs(KuduClient kuduClient, String hiveConnectionURL){
         super(kuduClient, hiveConnectionURL);
     }
 
-//    static int getTransactionCount(KuduClient client, int terminalId, String recordDate) throws KuduException {
-//        KuduTable table = client.openTable(kuduTableName);
-//        KuduScanner scanner = client.newScannerBuilder(table)
-//                .build();
-//
-//        while (scanner.hasMoreRows()) {
-//            RowResultIterator results = scanner.nextRows();
-//            while (results.hasNext()) {
-//                RowResult result = results.next();
-//                if(result.getInt(1) == terminalId && result.getString(0).equals(recordDate))
-//                    return result.getInt(2);
-//            }
-//        }
-//        return 0;
-//    }
+    private static void deleteRow(KuduClient client, String id) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduSession session = client.newSession();
+        Delete delete = table.newDelete();
+        delete.getRow().addString("TIME", id);
+        session.apply(delete);
+    }
 
-//    static void updateRow(KuduClient client,String timestamp, int keyValue, int newTransCount) throws KuduException {
-//        KuduTable table = client.openTable(kuduTableName);
-//        KuduSession session = client.newSession();
-//        Update update = table.newUpdate();
-//        update.getRow().addString("TIME",timestamp);
-//        update.getRow().addInt("TERMID", keyValue);
-//        update.getRow().addInt("TRANSCOUNT", newTransCount);
-//        session.apply(update);
-//    }
+    private static void insertRow(KuduClient client, String recordDate, int[] transactionCounts) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduSession session = client.newSession();
+        Insert insert = table.newInsert();
+        insert.getRow().addString("TIME", recordDate);
+        insert.getRow().addInt("OFF_US_COUNT", transactionCounts[0]);
+        insert.getRow().addInt("ON_US_COUNT", transactionCounts[1]);
+        session.apply(insert);
+        session.close();
+    }
 
-//    static void insertRow(KuduClient client, String timestamp, int keyValue) throws KuduException {
-//        // Open the newly-created table and create a KuduSession.
-//        KuduTable table = client.openTable(kuduTableName);
-//        KuduSession session = client.newSession();
-//        Insert insert = table.newInsert();
-//        insert.getRow().addString("TIME", timestamp);
-//        insert.getRow().addInt("TERMID", keyValue);
-//        insert.getRow().addInt("TRANSCOUNT", 1);
-//        session.apply(insert);
-//        session.close();
-//    }
+    private static int[] getTransactionCount(KuduClient client, String recordDate) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduScanner scanner = client.newScannerBuilder(table)
+                .build();
+        int[] transactionCounts = {-1, -1};
+        while (scanner.hasMoreRows()) {
+            RowResultIterator results = scanner.nextRows();
+            while (results.hasNext()) {
+                RowResult result = results.next();
+                if(result.getString("TIME").equals(recordDate)){
+                    transactionCounts[0] = result.getInt("OFF_US_COUNT");
+                    transactionCounts[1] = result.getInt("ON_US_COUNT");
+                    return transactionCounts;
+                }
+            }
+        }
+        return transactionCounts;
+    }
+
+    private static void updateRow(KuduClient client,String recordDate, int[] transactionCount) throws KuduException {
+        KuduTable table = client.openTable(kuduTableName);
+        KuduSession session = client.newSession();
+        Update update = table.newUpdate();
+        update.getRow().addString("TIME", recordDate);
+        update.getRow().addInt("OFF_US_COUNT", transactionCount[0]);
+        update.getRow().addInt("ON_US_COUNT", transactionCount[1]);
+        session.apply(update);
+    }
+
+    private static String[] parseTimestamp(String timestamp){
+        String[] time = new String[2];
+        time[1] = timestamp.substring(0,4);
+        time[0] = timestamp.substring(5,2);
+        return time;
+    }
 
     public void handleInsertion(FlowFile flowFile) throws Exception{
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String keyValue = flowFile.getAttribute("primary_key");
-        if(tableName == "transactions"){
-            //set KuduTable
-            KuduTable table = kuduClient.openTable(kuduTableName);
-
-            //get Terminal_ID from Hive
-            int terminalId;
+        if(tableName.equals("transactions")){
             Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
-            String query = "select * from transactions where MT_CODE = " + keyValue;
+            String query = "select * from transactions where mt_code = " + keyValue;
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
             rs.next();
-            terminalId = rs.getInt("TERM_ID");
-            String recordDate = (rs.getTimestamp("RECORD_DATE").getMonth() + 1)+ "-" + (rs.getTimestamp("RECORD_DATE").getYear() + 1900);
+            String recordDate = (rs.getTimestamp("record_date").getMonth() + 1)+ "-" + (rs.getTimestamp("record_date").getYear() + 1900);
 
+            int[] transactionCounts = getTransactionCount(kuduClient, recordDate);
 
-
-            //find entry of same terminal_id in Kudu and store Number of transactions
-            int transactionCount = getTransactionCount(kuduClient,terminalId,recordDate);
-            //Create new statement with inserting in kudu Number of transactions + 1
-            if(transactionCount == 0){
-                insertRow(kuduClient,recordDate,terminalId);
+            if(transactionCounts[0] == -1){
+                if(rs.getInt("tran_source") == rs.getInt("tran_dest")){
+                    transactionCounts[0] = 0;
+                    transactionCounts[1] = 1;
+                    insertRow(kuduClient,recordDate,transactionCounts);
+                }else{
+                    transactionCounts[0] = 1;
+                    transactionCounts[1] = 0;
+                    insertRow(kuduClient,recordDate,transactionCounts);
+                }
             }else{
-                updateRow(kuduClient,recordDate,terminalId,transactionCount+1);
+                if(rs.getInt("tran_source") == rs.getInt("tran_dest")){
+                    transactionCounts[1]++;
+                    updateRow(kuduClient,recordDate,transactionCounts);
+                }else{
+                    transactionCounts[0]++;
+                    updateRow(kuduClient,recordDate,transactionCounts);
+                }
             }
-
         }
     }
 
-    public void handleDeletion(){
-        System.out.println("Deletion Goes Here");
+    public void handleDeletion(FlowFile flowFile) throws KuduException{
+        String[] deletedValues = flowFile.getAttribute("new_values").split(",");
+        String oldSource = deletedValues[4];
+        String oldDest = deletedValues[5];
+        String[] time = parseTimestamp(deletedValues[6]);
+        String recordDate = time[0]+"-"+time[1];
+        int[] transactionCount = getTransactionCount(kuduClient,recordDate);
+        if(oldDest.equals(oldSource)){
+            transactionCount[1]--;
+        }else{
+            transactionCount[0]--;
+        }
+        if(transactionCount[0] == transactionCount[1] && transactionCount[0] == 0){
+            deleteRow(kuduClient, recordDate);
+        }else{
+            updateRow(kuduClient, recordDate, transactionCount);
+        }
     }
 
-    public void handleUpdate(){
-        System.out.println("Update Goes Here");
+    public void handleUpdate(FlowFile flowFile) throws KuduException{
+        String[] updatedValues = flowFile.getAttribute("new_values").split(",");
+        String oldSource = updatedValues[8];
+        String newSource = updatedValues[9];
+        String oldDest = updatedValues[10];
+        String newDest = updatedValues[11];
+        String[] oldTime = parseTimestamp(updatedValues[12]);
+        String[] newTime = parseTimestamp(updatedValues[13]);
+        String oldRecordDate = oldTime[0]+"-"+oldTime[1];
+        String newRecordDate = newTime[0]+"-"+newTime[1];
+        int[] oldTransactionCount = getTransactionCount(kuduClient,oldRecordDate);
+        int[] newTransactionCount = getTransactionCount(kuduClient,newRecordDate);
+        if(oldDest.equals(oldSource)){
+            oldTransactionCount[1]--;
+        }else{
+            oldTransactionCount[0]--;
+        }
+
+        if(oldTransactionCount[0] == oldTransactionCount[1] && oldTransactionCount[0] == 0){
+            deleteRow(kuduClient, oldRecordDate);
+        }else{
+            updateRow(kuduClient, oldRecordDate, oldTransactionCount);
+        }
+
+        if(newTransactionCount[0] == -1){
+            newTransactionCount[0] = 0;
+            newTransactionCount[1] = 0;
+            if(newDest.equals(newSource)){
+                newTransactionCount[1]++;
+            }else{
+                newTransactionCount[0]++;
+            }
+            insertRow(kuduClient, newRecordDate,newTransactionCount);
+        }else{
+            if(newDest.equals(newSource)){
+                newTransactionCount[1]++;
+            }else{
+                newTransactionCount[0]++;
+            }
+            updateRow(kuduClient, newRecordDate, newTransactionCount);
+        }
     }
 }
