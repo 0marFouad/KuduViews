@@ -143,7 +143,9 @@ public class PutMaterializedToKudu extends AbstractProcessor {
         this.kuduClient = this.createClient(kuduMasters, credentialsService);
         ArrayList<View> newList = new ArrayList<>();
         View TransTerm = new TransTerm(kuduClient,hiveConnectionURL);
+        View OffOnUs = new OffOnUs(kuduClient,hiveConnectionURL);
         newList.add(TransTerm);
+        newList.add(OffOnUs);
         tablesEditor.put("transactions",newList);
     }
 
