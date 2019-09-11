@@ -35,21 +35,21 @@ public class BankCustomer extends View {
                     update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") + 1);
                     session.apply(update);
                     session.close();
-                } else{
-                    Insert insert = table.newInsert();
-                    insert.getRow().addString("TIME", reg_date);
-                    insert.getRow().addInt("BANK_ID", bank_id);
-
-                    Date date= new Date();
-                    Long time = date.getTime();
-
-                    insert.getRow().addString("ID", time.toString());
-                    insert.getRow().addInt("CUSTOMERS_NUM", 1);
-                    session.apply(insert);
-                    session.close();
+                    return;
                 }
-
             }
+            Insert insert = table.newInsert();
+            insert.getRow().addString("TIME", reg_date);
+            insert.getRow().addInt("BANK_ID", bank_id);
+
+            Date date= new Date();
+            Long time = date.getTime();
+
+            insert.getRow().addString("ID", time.toString());
+            insert.getRow().addInt("CUSTOMERS_NUM", 1);
+            session.apply(insert);
+            session.close();
+
         }
 
     }
@@ -62,9 +62,9 @@ public class BankCustomer extends View {
             while (results.hasNext()) {
                 RowResult result = results.next();
                 if(result.getInt("BANK_ID") == bank_id && result.getString("REG_DATE").equals(reg_date)){
-                    Delete delete = table.newDelete();
-                    delete.getRow().addString("ID", result.getString("ID"));
-                    session.apply(delete);
+                    Update update = table.newUpdate();
+                    update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") - 1);
+                    session.apply(update);
                     session.close();
                 }
             }

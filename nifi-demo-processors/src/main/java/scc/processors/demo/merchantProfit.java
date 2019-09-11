@@ -8,15 +8,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Date;
+
 import static scc.processors.demo.merchantProfit.*;
 
 
 public class merchantProfit extends View {
 
 
-    private final static String kuduTableName = "merchant-profit";
+    private final static String kuduTableName = "views::merchant-profit";
 
-    private  int id =0;
+    private  String id;
     merchantProfit(KuduClient kuduClient, String hiveConnectionURL) {
         super(kuduClient, hiveConnectionURL);
     }
@@ -54,7 +56,7 @@ public class merchantProfit extends View {
 
                 KuduSession session = kuduClient.newSession();
                 Delete delete = table.newDelete();
-                delete.getRow().addInt("ID", merchantId);
+                delete.getRow().addString("ID", id);
                 session.apply(delete);
                 session.close();
             } else if (transactionCount == -1) {
@@ -134,8 +136,8 @@ public class merchantProfit extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt(0) == merchant_id)
-                    return result.getInt(2);
+                if(result.getInt(1) == merchant_id)
+                    return result.getInt(3);
             }
         }
         return 0;
@@ -150,19 +152,22 @@ public class merchantProfit extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt(0) == merchant_id){
-                    return result.getInt(3);}
+                if(result.getInt(1) == merchant_id){
+                    return result.getInt(4);}
             }
         }
         return 0;
     }
 
-    static void insertRow(KuduClient client, int keyValue,String merchant_name ,double transaction_amount) throws KuduException {
+    static void insertRow(KuduClient client, int merchant_id,String merchant_name ,double transaction_amount) throws KuduException {
         // Open the newly-created table and create a KuduSession.
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Insert insert = table.newInsert();
-        insert.getRow().addInt("MERCH_ID", keyValue);
+        Date date= new Date();
+        Long time = date.getTime();
+        insert.getRow().addString("ID",String.valueOf(time));
+        insert.getRow().addInt("MERCH_ID", merchant_id);
         insert.getRow().addString("MERCH-NAME", merchant_name);
         insert.getRow().addInt("TRANSCOUNT", 1);
         insert.getRow().addDouble("TOTAL-AMT-TRANS", transaction_amount);
@@ -174,6 +179,7 @@ public class merchantProfit extends View {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
+        update.getRow().addString("ID",id);
         update.getRow().addInt("MERCH_ID", merchantId);
         update.getRow().addInt("TRANS-NUM", transaction_count);
         update.getRow().addString("MERCH-NAME", merchant_name);
