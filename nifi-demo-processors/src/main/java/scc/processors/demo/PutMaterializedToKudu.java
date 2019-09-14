@@ -116,10 +116,7 @@ public class PutMaterializedToKudu extends AbstractProcessor {
         properties.add(QUERIES);
         properties.add(HIVE_URL);
         properties.add(KERBEROS_CREDENTIALS_SERVICE);
-//        properties.add(SKIP_HEAD_LINE);
         properties.add(FLUSH_MODE);
-//        properties.add(FLOWFILE_BATCH_SIZE);
-//        properties.add(BATCH_SIZE);
         return properties;
     }
 
@@ -135,18 +132,44 @@ public class PutMaterializedToKudu extends AbstractProcessor {
         String kuduMasters = context.getProperty(KUDU_MASTERS).evaluateAttributeExpressions().getValue();
         this.queriesJson = context.getProperty(QUERIES).getValue();
         this.hiveConnectionURL = context.getProperty(HIVE_URL).getValue();
-//        this.batchSize = context.getProperty(BATCH_SIZE).evaluateAttributeExpressions().asInteger();
-//        this.ffbatch = context.getProperty(FLOWFILE_BATCH_SIZE).evaluateAttributeExpressions().asInteger();
         this.flushMode = FlushMode.valueOf(context.getProperty(FLUSH_MODE).getValue());
         this.getLogger().debug("Setting up Kudu connection...");
         KerberosCredentialsService credentialsService = (KerberosCredentialsService)context.getProperty(KERBEROS_CREDENTIALS_SERVICE).asControllerService(KerberosCredentialsService.class);
         this.kuduClient = this.createClient(kuduMasters, credentialsService);
-        ArrayList<View> newList = new ArrayList<>();
         View TransTerm = new TransTerm(kuduClient,hiveConnectionURL);
         View OffOnUs = new OffOnUs(kuduClient,hiveConnectionURL);
-        newList.add(TransTerm);
-        newList.add(OffOnUs);
-        tablesEditor.put("transactions",newList);
+        View merchantProfit = new merchantProfit(kuduClient, hiveConnectionURL);
+        View BankCustomer = new BankCustomer(kuduClient, hiveConnectionURL);
+        View BankMerchant = new BankMerchant(kuduClient, hiveConnectionURL);
+        View BanksTransactions = new BanksTransactions(kuduClient, hiveConnectionURL);
+        View Customer_Merch = new Customer_Merch(kuduClient, hiveConnectionURL);
+        View Customer_Report = new Customer_Report(kuduClient, hiveConnectionURL);
+
+        ArrayList<View> tranList = new ArrayList<>();
+//        tranList.add(merchantProfit);
+//        tranList.add(BankMerchant);
+//        tranList.add(BanksTransactions);
+//        tranList.add(Customer_Merch);
+//        tranList.add(Customer_Report);
+        tranList.add(TransTerm);
+//        tranList.add(OffOnUs);
+        tablesEditor.put("transactions",tranList);
+
+        ArrayList<View> custList = new ArrayList<>();
+        custList.add(Customer_Report);
+        custList.add(Customer_Merch);
+        custList.add(BankCustomer);
+        tablesEditor.put("customers",custList);
+
+        ArrayList<View> mercList = new ArrayList<>();
+        mercList.add(Customer_Merch);
+        mercList.add(merchantProfit);
+        mercList.add(BankMerchant);
+        tablesEditor.put("merchants",mercList);
+        tablesEditor.put("banks", new ArrayList<>());
+        tablesEditor.put("cards", new ArrayList<>());
+        tablesEditor.put("terminals", new ArrayList<>());
+
     }
 
     protected KuduClient createClient(String masters, KerberosCredentialsService credentialsService) throws LoginException {
@@ -186,9 +209,7 @@ public class PutMaterializedToKudu extends AbstractProcessor {
                 this.kerberosUser.logout();
                 this.kerberosUser = null;
             }
-
         }
-
     }
 
     public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
@@ -210,205 +231,29 @@ public class PutMaterializedToKudu extends AbstractProcessor {
 
     private void trigger(ProcessContext context, ProcessSession session, List<FlowFile> flowFiles) throws ProcessException {
     	FlowFile flowFile = flowFiles.get(0);
-    	
 		try {
-	    	String currentTableName = flowFile.getAttribute("database_name");
-	    	currentTableName += "::" + flowFile.getAttribute("table_name");
-	    	if(!currentTableName.equals(tableName)) {
-	    		try {
-		            this.kuduTable = this.kuduClient.openTable(currentTableName);
-	    			tableName = currentTableName;
-		            this.getLogger().debug("Kudu connection successfully initialized");
-	    		} catch(Exception var52) {
-	    			this.getLogger().error("Failed to connect", var52);
-	        	    session.transfer(flowFile, REL_FAILURE);
-                    return;
-	    		}
-	    	}
-//	    	KuduSession kuduSession = this.getKuduSession(this.kuduClient);
-//
-//
-//	    	Operation operation = this.operationToKudu(flowFile);
-//
-//	    	kuduSession.apply(operation);
-//	    	kuduSession.close();
-
-            ArrayList<View> myList = new ArrayList<View>();
-	    	for(int i=0;i<myList.size();i++){
-	    	    myList.get(i).execute(flowFile.getAttribute("query_type"),flowFile);
-            }
-
-//	    	if (kuduSession.countPendingErrors() != 0) {
-//	    		this.getLogger().error("errors inserting rows");
-//	    	    org.apache.kudu.client.RowErrorsAndOverflowStatus roStatus = kuduSession.getPendingErrors();
-//	    	    org.apache.kudu.client.RowError[] errs = roStatus.getRowErrors();
-//	    	    int numErrs = errs.length;
-//	    	    this.getLogger().error("there were errors inserting rows to Kudu");
-//	    	    this.getLogger().error("the first few errors follow:");
-//	    	    for (int i = 0; i < numErrs; i++) {
-//	    	    	this.getLogger().error(errs[i].toString());
-//	    	    }
-//	    	    if (roStatus.isOverflowed()) {
-//	    	    	this.getLogger().error("error buffer overflowed: some errors were discarded");
-//	    	    }
-//	    	    session.transfer(flowFile, REL_FAILURE);
-//	    	} else {
-//	    		session.transfer(flowFile, REL_SUCCESS);
-//	    	}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+            String tableName = flowFile.getAttribute("table_name");
+            TransTerm tt = new TransTerm(kuduClient,hiveConnectionURL);
+//            ArrayList<View> myList = tablesEditor.get(tableName);
+//	    	for(int i=0;i<myList.size();i++){
+//                this.getLogger().debug("Before Execute");
+//                this.getLogger().debug(tableName);
+//                myList.get(i).execute(flowFile.getAttribute("query_type"),flowFile);
+//                this.getLogger().debug("After Execute");
+//            }
+            tt.execute(flowFile.getAttribute("query_type"),flowFile);
+            this.getLogger().debug("Managed to Insert");
+	    	session.transfer(flowFile, REL_SUCCESS);
+		} catch (Exception e) {
 			e.printStackTrace();
 			this.getLogger().error(e.getMessage());
+			this.getLogger().debug("Failed to Insert");
     	    session.transfer(flowFile, REL_FAILURE);
     	    return;
-		} catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private Operation getJoinRows(String primaryKey, Operation operation, FlowFile flowFile) {
-    	try
-	    {
-	    	String currentDName = flowFile.getAttribute("database_name");
-	    	String currentTName = flowFile.getAttribute("table_name");
-    		String query = null;
-    		int queriesJsonLength = JsonPath.read(this.queriesJson, "$.length()");
-	        this.getLogger().debug("queriesJsonLength: " + queriesJsonLength);
-    		for(int i = 0; i < queriesJsonLength; i++) {
-    			String dName = JsonPath.read(this.queriesJson, "$[" + i + "].dName");
-
-    			if(currentDName.equals(dName)) {
-    				String tName = JsonPath.read(this.queriesJson, "$[" + i + "].tName");
-    				if(tName.equals(currentTName)) {
-    					query = JsonPath.read(this.queriesJson, "$[" + i + "].query");
-    					break;
-    				}
-    			}
-    			if(i == queriesJsonLength-1) return null;
-    		}
-    		
-    		Class.forName(JDBC_DRIVER_NAME);
-    		
-    		String connectionUrl = this.hiveConnectionURL + "/" + currentDName;
-//    		String connectionUrl = this.hiveConnectionURL + "jdbc:hive2://localhost:10000/banking";
-    		
-    		if(conn == null) {
-    			conn = DriverManager.getConnection(connectionUrl, "hdfs", "");
-    		}
-		  
-    		// our SQL SELECT query. 
-    		// if you only need a few columns, specify them by name instead of using "*"
-//    		String query = "select MT_CODE, TRAN_AMOUNT, TERM_ID, CARD_ID, TRAN_SOURCE, TRAN_DEST, RECORD_DATE, card_no, a.name as custName, bSource.name as sourceName, bDest.name as destName from transactions as t inner join cards as c on t.CARD_ID = c.id inner join customers as a on c.cust_id = a.id inner join banks as bSource on bSource.id = t.TRAN_SOURCE inner join banks as bDest on bDest.id = t.TRAN_DEST where t.MT_CODE = " + primaryKey;
-//    		String query = "select * from transactions;";
-    		
-    		query = query.replace("|||", primaryKey);
-    		
-    		// create the java statement
-    		Statement st = conn.createStatement();
-		  
-    		// execute the query, and get a java resultset
-    		ResultSet rs = st.executeQuery(query);
-    		
-    		rs.next();
-    		
-    		int columnsCount = rs.getMetaData().getColumnCount();
-    		PartialRow row = operation.getRow();
-    		for(int i = 1; i <= columnsCount; i++) {
-    			String columnName = rs.getMetaData().getColumnLabel(i).toUpperCase();
-        		switch(rs.getMetaData().getColumnType(i)) {
-        		case Types.INTEGER:
-        			row.addInt(columnName, rs.getInt(i));
-        			break;
-        		case Types.VARCHAR:
-        		case Types.CHAR:
-        		case Types.LONGVARCHAR:
-        			row.addString(columnName, rs.getString(i));
-        			break;
-        		case Types.TINYINT:
-        			row.addByte(columnName, rs.getByte(i));
-        			break;
-        		case Types.SMALLINT:
-        			row.addShort(columnName, rs.getShort(i));
-        			break;
-        		case Types.BIGINT:
-        			row.addLong(columnName, rs.getLong(i));
-        			break;
-        		case Types.REAL:
-        			row.addFloat(columnName, rs.getFloat(i));
-        			break;
-        		case Types.DOUBLE:
-        			row.addDouble(columnName, rs.getDouble(i));
-        			break;
-        		case Types.DECIMAL:
-        			row.addDecimal(columnName, rs.getBigDecimal(i));
-        			break;
-        		case Types.TIMESTAMP:
-        			row.addString(columnName, rs.getTimestamp(i).toString());
-        			break;
-        		}
-        	}
-    		st.close();
-    		
-    		return operation;
-    	} catch (Exception e) {
-	    	this.getLogger().error("Got an exception! ");
-	    	this.getLogger().error(e.getMessage());
-	    }
-		return null;
-    }
-    
-    private Operation operationToKudu(FlowFile flowFile) {
-//    	Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
-//    	String type = JsonPath.read(document, "$.type");
-//    	List<Integer> columnsTypes = JsonPath.read(document, "$.columns[*].column_type");
-//    	List<String> columnsNames = JsonPath.read(document, "$.columns[*].name");
-//    	List columnsValues = JsonPath.read(document, "$.columns[*].value");
-    	Operation operation = null;
-    	String type = flowFile.getAttribute("query_type");
-    	String keyValue = flowFile.getAttribute("primary_key");
-    	String keyColumnName = flowFile.getAttribute("key_column_name");
-    	int keyColumnType = Integer.parseInt(flowFile.getAttribute("key_column_type"));
-    	if(type.equals("insert")) {
-    		operation = kuduTable.newInsert();
-    		return getJoinRows(keyValue, operation, flowFile);
-    	} else if(type.equals("delete")) {
-    		operation = kuduTable.newDelete();
-    	} else if(type.equals("update")) {
-    		operation = kuduTable.newUpdate();
-    		return getJoinRows(keyValue, operation, flowFile);
-    	}
-    	PartialRow row = operation.getRow();
-    	
-		switch(keyColumnType) {
-			case Types.INTEGER:
-				row.addInt(keyColumnName, Integer.parseInt(keyValue));
-				break;
-			case Types.VARCHAR:
-			case Types.CHAR:
-			case Types.LONGVARCHAR:
-				row.addString(keyColumnName, keyValue);
-				break;
-			case Types.TINYINT:
-				row.addByte(keyColumnName, Byte.parseByte(keyValue));
-				break;
-			case Types.SMALLINT:
-				row.addShort(keyColumnName, Short.parseShort(keyValue));
-				break;
-			case Types.BIGINT:
-				row.addLong(keyColumnName, Long.parseLong(keyValue));
-				break;
-			case Types.REAL:
-				row.addFloat(keyColumnName, Float.parseFloat(keyValue));
-				break;
-			case Types.DOUBLE:
-				row.addDouble(keyColumnName, Double.parseDouble(keyValue));
-				break;
-			case Types.DECIMAL:
-				row.addDecimal(keyColumnName, new BigDecimal(keyValue));
-				break;
 		}
-    	return operation;
     }
+
+
 
     protected KuduSession getKuduSession(KuduClient client) {
         KuduSession kuduSession = client.newSession();

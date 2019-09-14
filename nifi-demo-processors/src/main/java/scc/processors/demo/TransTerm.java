@@ -8,7 +8,7 @@ import java.util.Date;
 
 
 public class TransTerm extends View {
-    private final static String kuduTableName = "views::transaction-terminal";
+    private final static String kuduTableName = "transaction-terminal";
 
     TransTerm(KuduClient kuduClient, String hiveConnectionURL){
         super(kuduClient, hiveConnectionURL);
@@ -72,6 +72,7 @@ public class TransTerm extends View {
     }
 
     public void handleInsertion(FlowFile flowFile) throws Exception{
+        System.out.println("STARTED HANDLE INSERTION");
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String keyValue = flowFile.getAttribute("primary_key");
@@ -79,16 +80,18 @@ public class TransTerm extends View {
         Date date = new Date();
         Long time = date.getTime();
 
-        if(tableName == "transactions"){
+        if(tableName.equals("transactions")){
             //set KuduTable
             KuduTable table = kuduClient.openTable(kuduTableName);
 
             //get Terminal_ID from Hive
             int terminalId;
-            Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
+            Class.forName("org.apache.hive.jdbc.HiveDriver");
+            Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "", "");
             String query = "select * from transactions where MT_CODE = " + keyValue;
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(query);
+            System.out.println(rs);
             rs.next();
             terminalId = rs.getInt("TERM_ID");
             String recordDate = (rs.getTimestamp("RECORD_DATE").getMonth() + 1)+ "-" + (rs.getTimestamp("RECORD_DATE").getYear() + 1900);
@@ -148,6 +151,8 @@ public class TransTerm extends View {
             rowId = getRowId(kuduClient,newTerminalId,newRecordDate);
 
             if(transactionCount == 0){
+                Date date= new Date();
+                long time = date.getTime();
                 insertRow(kuduClient,newRecordDate,newTerminalId,String.valueOf(time));
             }else{
                 updateRow(kuduClient,newRecordDate,newTerminalId,transactionCount+1,rowId);

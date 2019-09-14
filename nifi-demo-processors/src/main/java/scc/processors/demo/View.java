@@ -20,7 +20,7 @@ abstract class View{
 
     public abstract void handleUpdate(FlowFile flowFile) throws Exception;
 
-    public final  void execute(String type,FlowFile flowFile) throws Exception{
+    public final  void execute(String type, FlowFile flowFile) throws Exception{
         if(type.equals("insert")){
             handleInsertion(flowFile);
         }
