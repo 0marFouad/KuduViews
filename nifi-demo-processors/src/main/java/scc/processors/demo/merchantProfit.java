@@ -16,7 +16,7 @@ import static scc.processors.demo.merchantProfit.*;
 public class merchantProfit extends View {
 
 
-    private final static String kuduTableName = "views::merchant-profit";
+    private final static String kuduTableName = "MerchantProfit";
 
     private  String id;
     merchantProfit(KuduClient kuduClient, String hiveConnectionURL) {
@@ -81,31 +81,38 @@ public class merchantProfit extends View {
     @Override
     public void handleInsertion(FlowFile flowFile) throws Exception {
 
-
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
-        int MT_CODE = Integer.parseInt(new_values[0]);
+        int MT_CODE = Integer.parseInt(new_values[1]);
 
-        KuduTable table = kuduClient.openTable(tableName);
+        KuduTable table = kuduClient.openTable(kuduTableName);
         Schema schema = table.getSchema();
 
         //get Terminal_ID from Hive
         Integer merchantId;
         double transaction_amount;
+        System.out.println("hussein");
+
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
-        String query = "select * from transactions as a inner join terminals as b on a.TERM_ID = b.id inner join " +
-                " merchants as c on b.merch_id = c.id where MT_CODE = " + MT_CODE;
+        System.out.println("omar");
+
+            String query = "select * from transactions where MT_CODE = " + MT_CODE;
+
         Statement st = conn.createStatement();
+
         ResultSet rs = st.executeQuery(query);
+
         rs.next();
-        merchantId = rs.getInt("merch_id");
-        String merchant_name = rs.getString("name");
-        transaction_amount = rs.getDouble("TRAN_AMOUNT");
+        merchantId = 1;
 
+        String merchant_name = "carefour";
+        transaction_amount =500;
 
-        int transactionCount = getTransactionCount(kuduClient,tableName,merchantId);
-        double total_transaction_amount = getTransactionAmount(kuduClient,tableName,merchantId);
+        int transactionCount = getTransactionCount(kuduClient,kuduTableName,merchantId);
+
+        double total_transaction_amount = getTransactionAmount(kuduClient,kuduTableName,merchantId);
+
         //Create new statement with inserting in kudu Number of transactions + 1
         if(transactionCount == 0){
             insertRow(kuduClient,merchantId,merchant_name,transaction_amount);
@@ -168,9 +175,9 @@ public class merchantProfit extends View {
         Long time = date.getTime();
         insert.getRow().addString("ID",String.valueOf(time));
         insert.getRow().addInt("MERCH_ID", merchant_id);
-        insert.getRow().addString("MERCH-NAME", merchant_name);
+        insert.getRow().addString("MERCH_NAME", merchant_name);
         insert.getRow().addInt("TRANSCOUNT", 1);
-        insert.getRow().addDouble("TOTAL-AMT-TRANS", transaction_amount);
+        insert.getRow().addDouble("TRANS_AMT", transaction_amount);
         session.apply(insert);
         session.close();
     }
@@ -182,8 +189,8 @@ public class merchantProfit extends View {
         update.getRow().addString("ID",id);
         update.getRow().addInt("MERCH_ID", merchantId);
         update.getRow().addInt("TRANS-NUM", transaction_count);
-        update.getRow().addString("MERCH-NAME", merchant_name);
-        update.getRow().addDouble("TOTAL-AMT-TRANS", transaction_amount);
+        update.getRow().addString("MERCH_NAME", merchant_name);
+        update.getRow().addDouble("TRANS_AMT", transaction_amount);
         session.apply(update);
         session.close();
 
@@ -239,7 +246,7 @@ public class merchantProfit extends View {
                 KuduSession session = kuduClient.newSession();
                 Update update = table.newUpdate();
                 update.getRow().addInt("MERCH_ID", merch_id);
-                update.getRow().addString("MERCH-NAME", new_merch_name);
+                update.getRow().addString("MERCH_NAME", new_merch_name);
                 session.apply(update);
                 session.close();
 

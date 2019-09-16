@@ -81,9 +81,9 @@ public class TestMain {
 		try {
 	      // create our mysql database connection
 	      String myDriver = "com.mysql.cj.jdbc.Driver";
-	      String myUrl = "jdbc:mysql://localhost:3306/testhive";
+	      String myUrl = "jdbc:mysql://localhost:3306/banking";
 	      Class.forName(myDriver);
-	      Connection conn = DriverManager.getConnection(myUrl, "root", "omar1234");
+	      Connection conn = DriverManager.getConnection(myUrl, "root", "ahmed123456");
 	      
 	      // our SQL SELECT query. 
 	      // if you only need a few columns, specify them by name instead of using "*"

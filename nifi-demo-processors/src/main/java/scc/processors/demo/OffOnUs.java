@@ -3,10 +3,13 @@ package scc.processors.demo;
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class OffOnUs extends View {
 
-    private final static String kuduTableName = "off-on-us";
+    private final static String kuduTableName = "offonus";
 
     OffOnUs(KuduClient kuduClient, String hiveConnectionURL){
         super(kuduClient, hiveConnectionURL);
@@ -60,10 +63,16 @@ public class OffOnUs extends View {
         session.apply(update);
     }
 
-    private static String[] parseTimestamp(String timestamp){
+    private static String[] parseTimestamp(String timestamp) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(timestamp);
+        timestamp = timestamp.substring(1, timestamp.length() - 2);
+        System.out.println(timestamp + " after");
+        Date date = formatter.parse(timestamp);
+
         String[] time = new String[2];
-        time[1] = timestamp.substring(0,4);
-        time[0] = timestamp.substring(5,2);
+        time[1] = Integer.toString(date.getYear() + 1900);
+        time[0] = Integer.toString(date.getMonth() + 1);
         return time;
     }
 
@@ -103,7 +112,7 @@ public class OffOnUs extends View {
         }
     }
 
-    public void handleDeletion(FlowFile flowFile) throws KuduException{
+    public void handleDeletion(FlowFile flowFile) throws Exception{
         String[] deletedValues = flowFile.getAttribute("new_values").split(",");
         String oldSource = deletedValues[4];
         String oldDest = deletedValues[5];
@@ -122,7 +131,7 @@ public class OffOnUs extends View {
         }
     }
 
-    public void handleUpdate(FlowFile flowFile) throws KuduException{
+    public void handleUpdate(FlowFile flowFile) throws Exception{
         String[] updatedValues = flowFile.getAttribute("new_values").split(",");
         String oldSource = updatedValues[8];
         String newSource = updatedValues[9];

@@ -108,6 +108,40 @@ public class PutMaterializedToKudu extends AbstractProcessor {
     private static final String JDBC_DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
 
     public PutMaterializedToKudu() {
+        View TransTerm = new TransTerm(kuduClient,hiveConnectionURL);
+        View OffOnUs = new OffOnUs(kuduClient,hiveConnectionURL);
+        View merchantProfit = new merchantProfit(kuduClient, hiveConnectionURL);
+        View BankCustomer = new BankCustomer(kuduClient, hiveConnectionURL);
+        View BankMerchant = new BankMerchant(kuduClient, hiveConnectionURL);
+        View BanksTransactions = new BanksTransactions(kuduClient, hiveConnectionURL);
+        View Customer_Merch = new Customer_Merch(kuduClient, hiveConnectionURL);
+        View Customer_Report = new Customer_Report(kuduClient, hiveConnectionURL);
+
+        ArrayList<View> tranList = new ArrayList<>();
+        tranList.add(merchantProfit);
+        tranList.add(BankMerchant);
+        tranList.add(BanksTransactions);
+        tranList.add(Customer_Merch);
+        tranList.add(Customer_Report);
+        tranList.add(TransTerm);
+        tranList.add(OffOnUs);
+        tablesEditor.put("transactions",tranList);
+
+        ArrayList<View> custList = new ArrayList<>();
+        custList.add(Customer_Report);
+        custList.add(Customer_Merch);
+        custList.add(BankCustomer);
+        tablesEditor.put("customers",custList);
+
+        ArrayList<View> mercList = new ArrayList<>();
+        mercList.add(Customer_Merch);
+        mercList.add(merchantProfit);
+        mercList.add(BankMerchant);
+        tablesEditor.put("merchants",mercList);
+        tablesEditor.put("banks", new ArrayList<>());
+        tablesEditor.put("cards", new ArrayList<>());
+        tablesEditor.put("terminals", new ArrayList<>());
+
     }
 
     protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
@@ -136,40 +170,6 @@ public class PutMaterializedToKudu extends AbstractProcessor {
         this.getLogger().debug("Setting up Kudu connection...");
         KerberosCredentialsService credentialsService = (KerberosCredentialsService)context.getProperty(KERBEROS_CREDENTIALS_SERVICE).asControllerService(KerberosCredentialsService.class);
         this.kuduClient = this.createClient(kuduMasters, credentialsService);
-        View TransTerm = new TransTerm(kuduClient,hiveConnectionURL);
-        View OffOnUs = new OffOnUs(kuduClient,hiveConnectionURL);
-        View merchantProfit = new merchantProfit(kuduClient, hiveConnectionURL);
-        View BankCustomer = new BankCustomer(kuduClient, hiveConnectionURL);
-        View BankMerchant = new BankMerchant(kuduClient, hiveConnectionURL);
-        View BanksTransactions = new BanksTransactions(kuduClient, hiveConnectionURL);
-        View Customer_Merch = new Customer_Merch(kuduClient, hiveConnectionURL);
-        View Customer_Report = new Customer_Report(kuduClient, hiveConnectionURL);
-
-        ArrayList<View> tranList = new ArrayList<>();
-//        tranList.add(merchantProfit);
-//        tranList.add(BankMerchant);
-//        tranList.add(BanksTransactions);
-//        tranList.add(Customer_Merch);
-//        tranList.add(Customer_Report);
-        tranList.add(TransTerm);
-//        tranList.add(OffOnUs);
-        tablesEditor.put("transactions",tranList);
-
-        ArrayList<View> custList = new ArrayList<>();
-        custList.add(Customer_Report);
-        custList.add(Customer_Merch);
-        custList.add(BankCustomer);
-        tablesEditor.put("customers",custList);
-
-        ArrayList<View> mercList = new ArrayList<>();
-        mercList.add(Customer_Merch);
-        mercList.add(merchantProfit);
-        mercList.add(BankMerchant);
-        tablesEditor.put("merchants",mercList);
-        tablesEditor.put("banks", new ArrayList<>());
-        tablesEditor.put("cards", new ArrayList<>());
-        tablesEditor.put("terminals", new ArrayList<>());
-
     }
 
     protected KuduClient createClient(String masters, KerberosCredentialsService credentialsService) throws LoginException {
@@ -234,14 +234,39 @@ public class PutMaterializedToKudu extends AbstractProcessor {
 		try {
             String tableName = flowFile.getAttribute("table_name");
             TransTerm tt = new TransTerm(kuduClient,hiveConnectionURL);
-//            ArrayList<View> myList = tablesEditor.get(tableName);
-//	    	for(int i=0;i<myList.size();i++){
-//                this.getLogger().debug("Before Execute");
-//                this.getLogger().debug(tableName);
-//                myList.get(i).execute(flowFile.getAttribute("query_type"),flowFile);
-//                this.getLogger().debug("After Execute");
-//            }
-            tt.execute(flowFile.getAttribute("query_type"),flowFile);
+            OffOnUs offon = new OffOnUs(kuduClient,hiveConnectionURL);
+            merchantProfit mp = new merchantProfit(kuduClient, hiveConnectionURL);
+            BankCustomer bc = new BankCustomer(kuduClient, hiveConnectionURL);
+            BankMerchant bm = new BankMerchant(kuduClient, hiveConnectionURL);
+            BanksTransactions bt = new BanksTransactions(kuduClient, hiveConnectionURL);
+            Customer_Merch cm = new Customer_Merch(kuduClient, hiveConnectionURL);
+            Customer_Report cr = new Customer_Report(kuduClient, hiveConnectionURL);
+
+            if(tableName.equals("transactions")){
+                this.getLogger().debug(tableName);
+                this.getLogger().debug(flowFile.getAttribute("query_type"));
+
+                tt.execute(flowFile.getAttribute("query_type"),flowFile);
+                offon.execute(flowFile.getAttribute("query_type"),flowFile);
+               mp.execute(flowFile.getAttribute("query_type"),flowFile);
+              /*   bm.execute(flowFile.getAttribute("query_type"),flowFile);
+                bt.execute(flowFile.getAttribute("query_type"),flowFile);
+                cm.execute(flowFile.getAttribute("query_type"),flowFile);
+                cr.execute(flowFile.getAttribute("query_type"),flowFile);*/
+            }
+
+            if(tableName.equals("customers")){
+                bc.execute(flowFile.getAttribute("query_type"),flowFile);
+                cm.execute(flowFile.getAttribute("query_type"),flowFile);
+                cr.execute(flowFile.getAttribute("query_type"),flowFile);
+            }
+
+            if(tableName.equals("merchants")){
+                cm.execute(flowFile.getAttribute("query_type"),flowFile);
+                mp.execute(flowFile.getAttribute("query_type"),flowFile);
+                bm.execute(flowFile.getAttribute("query_type"),flowFile);
+            }
+
             this.getLogger().debug("Managed to Insert");
 	    	session.transfer(flowFile, REL_SUCCESS);
 		} catch (Exception e) {

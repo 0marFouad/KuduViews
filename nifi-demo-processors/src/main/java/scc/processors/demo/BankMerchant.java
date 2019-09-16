@@ -77,6 +77,7 @@ public class BankMerchant extends View {
     @Override
     public void handleInsertion(FlowFile flowFile) throws Exception {
         String databaseName = flowFile.getAttribute("database_name");
+        Class.forName("org.apache.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
         Statement st = conn.createStatement();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -111,7 +112,8 @@ public class BankMerchant extends View {
     @Override
     public void handleDeletion(FlowFile flowFile) throws Exception {
         String databaseName = flowFile.getAttribute("database_name");
-        Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
+        Class.forName("org.apache.hive.jdbc.HiveDriver");
+        Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "", "");
         Statement st = conn.createStatement();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

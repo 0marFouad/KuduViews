@@ -3,14 +3,17 @@ package scc.processors.demo;
 
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
+
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 public class TransTerm extends View {
-    private final static String kuduTableName = "transaction-terminal";
+    private final static String kuduTableName = "TransactionTerminal";
 
-    TransTerm(KuduClient kuduClient, String hiveConnectionURL){
+    TransTerm(KuduClient kuduClient, String hiveConnectionURL) {
         super(kuduClient, hiveConnectionURL);
     }
 
@@ -23,7 +26,7 @@ public class TransTerm extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt("TERMID") == terminalId && result.getString("TIME").equals(recordDate))
+                if (result.getInt("TERMID") == terminalId && result.getString("TIME").equals(recordDate))
                     return result.getInt("TRANSCOUNT");
             }
         }
@@ -39,7 +42,7 @@ public class TransTerm extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt("TERMID") == terminalId && result.getString("TIME").equals(recordDate))
+                if (result.getInt("TERMID") == terminalId && result.getString("TIME").equals(recordDate))
                     return result.getString("ID");
             }
         }
@@ -47,12 +50,12 @@ public class TransTerm extends View {
     }
 
 
-    private static void updateRow(KuduClient client,String timestamp, int keyValue, int newTransCount, String rowId) throws KuduException {
+    private static void updateRow(KuduClient client, String timestamp, int keyValue, int newTransCount, String rowId) throws KuduException {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
-        update.getRow().addString("ID",rowId);
-        update.getRow().addString("TIME",timestamp);
+        update.getRow().addString("ID", rowId);
+        update.getRow().addString("TIME", timestamp);
         update.getRow().addInt("TERMID", keyValue);
         update.getRow().addInt("TRANSCOUNT", newTransCount);
         session.apply(update);
@@ -71,7 +74,7 @@ public class TransTerm extends View {
         session.close();
     }
 
-    public void handleInsertion(FlowFile flowFile) throws Exception{
+    public void handleInsertion(FlowFile flowFile) throws Exception {
         System.out.println("STARTED HANDLE INSERTION");
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
@@ -80,7 +83,7 @@ public class TransTerm extends View {
         Date date = new Date();
         Long time = date.getTime();
 
-        if(tableName.equals("transactions")){
+        if (tableName.equals("transactions")) {
             //set KuduTable
             KuduTable table = kuduClient.openTable(kuduTableName);
 
@@ -94,43 +97,57 @@ public class TransTerm extends View {
             System.out.println(rs);
             rs.next();
             terminalId = rs.getInt("TERM_ID");
-            String recordDate = (rs.getTimestamp("RECORD_DATE").getMonth() + 1)+ "-" + (rs.getTimestamp("RECORD_DATE").getYear() + 1900);
-
-
+            int month = (rs.getTimestamp("RECORD_DATE").getMonth() + 1);
+            String recordDate;
+            recordDate = (rs.getTimestamp("RECORD_DATE").getMonth() + 1) + "-" + (rs.getTimestamp("RECORD_DATE").getYear() + 1900);
 
             //find entry of same terminal_id in Kudu and store Number of transactions
-            int transactionCount = getTransactionCount(kuduClient,terminalId,recordDate);
-            String rowId = getRowId(kuduClient,terminalId,recordDate);
+            int transactionCount = getTransactionCount(kuduClient, terminalId, recordDate);
+            String rowId = getRowId(kuduClient, terminalId, recordDate);
             //Create new statement with inserting in kudu Number of transactions + 1
-            if(transactionCount == 0){
-                insertRow(kuduClient,recordDate,terminalId,String.valueOf(time));
-            }else{
-                updateRow(kuduClient,recordDate,terminalId,transactionCount+1,rowId);
+
+            if (transactionCount == 0) {
+                insertRow(kuduClient, recordDate, terminalId, String.valueOf(time));
+            } else {
+                updateRow(kuduClient, recordDate, terminalId, transactionCount + 1, rowId);
             }
 
         }
     }
 
-    private static String[] parseTimestamp(String timestamp){
+    private static String[] parseTimestamp(String timestamp) throws Exception {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(timestamp);
+        timestamp = timestamp.substring(1, timestamp.length() - 2);
+        System.out.println(timestamp + " after");
+        Date date = formatter.parse(timestamp);
+
         String[] time = new String[2];
-        time[1] = timestamp.substring(0,4);
-        time[0] = timestamp.substring(5,2);
+        time[1] = Integer.toString(date.getYear() + 1900);
+        time[0] = Integer.toString(date.getMonth() + 1);
+        System.out.println("hesham3ars"+time[1]+"-"+time[0]);
         return time;
     }
 
-    public void handleDeletion(FlowFile flowFile) throws KuduException{
+    public void handleDeletion(FlowFile flowFile) throws Exception {
         String[] deletedValues = flowFile.getAttribute("new_values").split(",");
+//        System.out.println(deletedValues[0] + " " + deletedValues[1] + " " + deletedValues.length);
         int terminalId = Integer.valueOf(deletedValues[2]);
         String[] time = parseTimestamp(deletedValues[6]);
-        String recordDate = time[0]+"-"+time[1];
-        int transactionCount = getTransactionCount(kuduClient,terminalId,recordDate);
-        String rowId = getRowId(kuduClient,terminalId,recordDate);
-        updateRow(kuduClient,recordDate,terminalId,transactionCount-1,rowId);
+
+        String recordDate = time[0] + "-" + time[1];
+        int transactionCount = getTransactionCount(kuduClient, terminalId, recordDate);
+        System.out.println(deletedValues[0] + " " + deletedValues[1] + " " + deletedValues.length);
+
+        String rowId = getRowId(kuduClient, terminalId, recordDate);
+
+        updateRow(kuduClient, recordDate, terminalId, transactionCount - 1, rowId);
+
     }
 
-    public void handleUpdate(FlowFile flowFile) throws KuduException{
+    public void handleUpdate(FlowFile flowFile) throws Exception {
         String[] updatedValues = flowFile.getAttribute("new_values").split(",");
-        if(!updatedValues[4].equals(updatedValues[5])){
+        if (!updatedValues[4].equals(updatedValues[5])) {
             int oldTerminalId = Integer.valueOf(updatedValues[4]);
             int newTerminalId = Integer.valueOf(updatedValues[5]);
             String[] oldTime = parseTimestamp(updatedValues[12]);
@@ -138,24 +155,24 @@ public class TransTerm extends View {
             String oldRecordDate = oldTime[0] + "-" + oldTime[1];
             String newRecordDate = newTime[0] + "-" + newTime[1];
 
-            int transactionCount = getTransactionCount(kuduClient,oldTerminalId,oldRecordDate);
-            String rowId = getRowId(kuduClient,oldTerminalId,oldRecordDate);
+            int transactionCount = getTransactionCount(kuduClient, oldTerminalId, oldRecordDate);
+            String rowId = getRowId(kuduClient, oldTerminalId, oldRecordDate);
 
-            if(transactionCount == 1){
-                updateRow(kuduClient,oldRecordDate,oldTerminalId,transactionCount-1,rowId);
-            }else{
+            if (transactionCount == 1) {
+                updateRow(kuduClient, oldRecordDate, oldTerminalId, transactionCount - 1, rowId);
+            } else {
 
             }
 
-            transactionCount = getTransactionCount(kuduClient,newTerminalId,newRecordDate);
-            rowId = getRowId(kuduClient,newTerminalId,newRecordDate);
+            transactionCount = getTransactionCount(kuduClient, newTerminalId, newRecordDate);
+            rowId = getRowId(kuduClient, newTerminalId, newRecordDate);
 
-            if(transactionCount == 0){
-                Date date= new Date();
+            if (transactionCount == 0) {
+                Date date = new Date();
                 long time = date.getTime();
-                insertRow(kuduClient,newRecordDate,newTerminalId,String.valueOf(time));
-            }else{
-                updateRow(kuduClient,newRecordDate,newTerminalId,transactionCount+1,rowId);
+                insertRow(kuduClient, newRecordDate, newTerminalId, String.valueOf(time));
+            } else {
+                updateRow(kuduClient, newRecordDate, newTerminalId, transactionCount + 1, rowId);
             }
 
         }
