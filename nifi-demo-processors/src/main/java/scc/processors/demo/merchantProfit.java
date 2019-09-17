@@ -90,24 +90,47 @@ public class merchantProfit extends View {
         Schema schema = table.getSchema();
 
         //get Terminal_ID from Hive
-        Integer merchantId;
+        int merchantId;
+        int terminalId;
+        String merchantName;
         double transaction_amount;
         System.out.println("hussein");
-
+        Class.forName("org.apache.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
-        System.out.println("omar");
 
-            String query = "select * from transactions where MT_CODE = " + MT_CODE;
 
+
+        // get terminal id & transactions_amount from transactions
+        String query = "select * from transactions where MT_CODE = " + MT_CODE;
         Statement st = conn.createStatement();
-
         ResultSet rs = st.executeQuery(query);
-
+        System.out.println(rs);
         rs.next();
-        merchantId = 1;
+        terminalId = rs.getInt("TERM_ID");
+        transaction_amount = rs.getInt("TRAN_AMOUNT");
 
-        String merchant_name = "carefour";
-        transaction_amount =500;
+        // get merch-id from terminals;
+
+
+        query = "select * from terminals where id = " + terminalId;
+        st = conn.createStatement();
+        rs = st.executeQuery(query);
+        System.out.println(rs);
+        rs.next();
+        merchantId = rs.getInt("merch_id");
+
+
+        //get merchant name from merchants
+
+        query = "select * from merchants where id = " + merchantId;
+        st = conn.createStatement();
+        rs = st.executeQuery(query);
+        System.out.println(rs);
+        rs.next();
+        merchantName = rs.getString("name");
+
+
+
 
         int transactionCount = getTransactionCount(kuduClient,kuduTableName,merchantId);
 
@@ -115,9 +138,9 @@ public class merchantProfit extends View {
 
         //Create new statement with inserting in kudu Number of transactions + 1
         if(transactionCount == 0){
-            insertRow(kuduClient,merchantId,merchant_name,transaction_amount);
+            insertRow(kuduClient,merchantId,merchantName,transaction_amount);
         }else{
-            updateRow(kuduClient,merchantId,merchant_name ,transaction_amount+total_transaction_amount,transactionCount+1);
+            updateRow(kuduClient,merchantId,merchantName ,transaction_amount+total_transaction_amount,transactionCount+1);
         }
 
 

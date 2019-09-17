@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a00b5021-bfe2-4fbe-b4af-7393e1e2ae6c" name="Default Changelist" comment="Added Class OffOnUs">
-      <change afterPath="$PROJECT_DIR$/../.idea/PutMaterializedToKudu.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
+    <list default="true" id="a00b5021-bfe2-4fbe-b4af-7393e1e2ae6c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/PutMaterializedToKudu.java" beforeDir="false" afterPath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/PutMaterializedToKudu.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java" beforeDir="false" afterPath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java" beforeDir="false" afterPath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java" beforeDir="false" afterPath="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -28,29 +20,37 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/PutMaterializedToKudu.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="243" column="69" lean-forward="true" selection-start-line="243" selection-start-column="69" selection-end-line="243" selection-end-column="69" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-441">
-              <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="63" />
-            </state>
-          </provider>
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="22" column="10" selection-start-line="22" selection-start-column="10" selection-end-line="22" selection-end-column="10" />
+            <state relative-caret-position="285">
+              <caret line="20" column="56" selection-start-line="20" selection-start-column="56" selection-end-line="20" selection-end-column="56" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="5" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="311">
+              <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="151" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -61,54 +61,32 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="89" column="39" selection-start-line="89" selection-start-column="39" selection-end-line="89" selection-end-column="39" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="212">
+              <caret line="98" column="35" lean-forward="true" selection-start-line="98" selection-end-line="99" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java">
+        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankMerchant.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="42">
-              <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="1170">
+              <caret line="85" column="63" selection-start-line="85" selection-start-column="63" selection-end-line="85" selection-end-column="63" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/OffOnUs.java">
+        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankCustomer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="159">
-              <caret line="152" column="41" selection-start-line="152" selection-start-column="41" selection-end-line="152" selection-end-column="41" />
+            <state relative-caret-position="1185">
+              <caret line="89" column="48" selection-start-line="89" selection-start-column="48" selection-end-line="89" selection-end-column="48" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#458#459#0" expanded="true" />
+                <element signature="e#510#511#0" expanded="true" />
               </folding>
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="42">
-              <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -122,11 +100,11 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>rs.next</find>
-      <find>logger</find>
-      <find>kuduSession</find>
-      <find>logg</find>
-      <find>conn</find>
+      <find>insertRow</find>
+      <find>hive</find>
+      <find>QUERIES</find>
+      <find>hiveConnectionURL</find>
+      <find>profit</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -135,19 +113,21 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TestMain.java" />
-        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/OffOnUs.java" />
         <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java" />
-        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java" />
         <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/PutMaterializedToKudu.java" />
+        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java" />
+        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TestMain.java" />
+        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankCustomer.java" />
+        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BanksTransactions.java" />
+        <option value="$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="969" />
-    <option name="y" value="355" />
-    <option name="width" value="877" />
-    <option name="height" value="789" />
+    <option name="x" value="67" />
+    <option name="y" value="25" />
+    <option name="width" value="1299" />
+    <option name="height" value="743" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -159,18 +139,51 @@
         <subPane>
           <expand>
             <path>
-              <item name="SCC-processors" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SCC-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="SCC-processors" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SCC-processors" type="462c0819:PsiDirectoryNode" />
-              <item name="nifi-demo-nar" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SCC-processors" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SCC-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
               <item name="nifi-demo-processors" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
+              <item name="nifi-demo-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
+              <item name="nifi-demo-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
+              <item name="nifi-demo-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
+              <item name="nifi-demo-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="demo" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="KuduViews" type="b2602c69:ProjectViewProjectNode" />
+              <item name="KuduViews" type="462c0819:PsiDirectoryNode" />
+              <item name="nifi-demo-processors" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -183,7 +196,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/kudu-master (1)/kudu-master/examples/java/java-example/pom.xml" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/pom.xml" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="vcs.Subversion" />
@@ -240,32 +253,53 @@
       <option name="presentableId" value="Default" />
       <updated>1567886994856</updated>
     </task>
-    <task id="LOCAL-00001" summary="Editted handling Insertion based on Kudu Schema Changes">
-      <created>1568116192435</created>
+    <task id="LOCAL-00001" summary="just commit not to be pushed">
+      <created>1568020067573</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1568116192435</updated>
+      <updated>1568020067573</updated>
     </task>
-    <task id="LOCAL-00002" summary="Editted TransTerm ID is now String">
-      <created>1568128683827</created>
+    <task id="LOCAL-00002" summary="add merchantProfit class">
+      <created>1568031229157</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1568128683827</updated>
+      <updated>1568031229157</updated>
     </task>
-    <task id="LOCAL-00003" summary="Added Class OffOnUs">
-      <created>1568216790041</created>
+    <task id="LOCAL-00003" summary="delete target">
+      <created>1568031575464</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1568216790041</updated>
+      <updated>1568031575464</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="merchant profit complete without testing">
+      <created>1568119477453</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1568119477453</updated>
+    </task>
+    <task id="LOCAL-00005" summary="bank transactions complete without testing">
+      <created>1568132011738</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1568132011738</updated>
+    </task>
+    <task id="LOCAL-00006" summary="make id string instead int64">
+      <created>1568195524191</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1568195524191</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
+    <frame x="67" y="25" width="1299" height="743" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
@@ -273,11 +307,11 @@
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info content_ui="combo" id="Project" order="5" visible="true" weight="0.19811843" />
-      <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="0" sideWeight="0.4991699" visible="true" weight="0.27083334" />
-      <window_info anchor="bottom" id="Event Log" order="1" sideWeight="0.5008301" side_tool="true" weight="0.2872807" />
-      <window_info anchor="bottom" id="Version Control" order="2" weight="0.32822758" />
+      <window_info active="true" content_ui="combo" id="Project" order="5" sideWeight="0.49753696" visible="true" weight="0.28092578" />
+      <window_info id="Structure" order="6" sideWeight="0.50246304" side_tool="true" weight="0.25778133" />
+      <window_info anchor="bottom" id="Terminal" order="0" sideWeight="0.4997233" weight="0.32785088" />
+      <window_info anchor="bottom" id="Event Log" order="1" sideWeight="0.5011971" side_tool="true" weight="0.10586319" />
+      <window_info anchor="bottom" id="Version Control" order="2" sideWeight="0.49880287" visible="true" weight="0.048859935" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" />
       <window_info anchor="bottom" id="Run" order="5" weight="0.3760965" />
@@ -285,7 +319,6 @@
       <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" visible="true" weight="0.32894737" />
       <window_info anchor="right" id="Theme Preview" order="0" />
       <window_info anchor="right" id="Capture Analysis" order="1" />
       <window_info anchor="right" id="Palette&#9;" order="2" />
@@ -295,24 +328,44 @@
       <window_info anchor="right" id="Ant Build" order="6" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="7" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Designer" order="0" />
+      <window_info id="UI Designer" order="1" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info id="Image Layers" order="4" />
+      <window_info content_ui="combo" id="Project" order="5" sideWeight="0.49753696" visible="true" weight="0.27134877" />
+      <window_info id="Structure" order="6" sideWeight="0.50246304" side_tool="true" weight="0.25778133" />
+      <window_info anchor="bottom" id="Terminal" order="0" sideWeight="0.4997233" weight="0.32785088" />
+      <window_info anchor="bottom" id="Event Log" order="1" sideWeight="0.5011971" side_tool="true" weight="0.10586319" />
+      <window_info anchor="bottom" id="Version Control" order="2" sideWeight="0.49880287" visible="true" weight="0.14495113" />
+      <window_info anchor="bottom" id="Message" order="3" />
+      <window_info anchor="bottom" id="Find" order="4" />
+      <window_info anchor="bottom" id="Run" order="5" weight="0.3760965" />
+      <window_info anchor="bottom" id="Debug" order="6" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="9" />
+      <window_info anchor="right" id="Theme Preview" order="0" />
+      <window_info anchor="right" id="Capture Analysis" order="1" />
+      <window_info anchor="right" id="Palette&#9;" order="2" />
+      <window_info anchor="right" id="Maven" order="3" />
+      <window_info anchor="right" id="Palette" order="4" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="5" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="6" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="7" weight="0.25" />
+    </layout-to-restore>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Editted handling Insertion based on Kudu Schema Changes" />
-    <MESSAGE value="Editted TransTerm ID is now String" />
-    <MESSAGE value="Added Class OffOnUs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Class OffOnUs" />
+    <MESSAGE value="just commit not to be pushed" />
+    <MESSAGE value="add merchantProfit class" />
+    <MESSAGE value="delete target" />
+    <MESSAGE value="merchant profit complete without testing" />
+    <MESSAGE value="bank transactions complete without testing" />
+    <MESSAGE value="make id string instead int64" />
+    <option name="LAST_COMMIT_MESSAGE" value="make id string instead int64" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TestMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="104" column="45" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/modules.xml">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -342,74 +395,10 @@
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Report.java">
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TestMain.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/Customer_Merch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/OffOnUs.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="152" column="41" selection-start-line="152" selection-start-column="41" selection-end-line="152" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-441">
-          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/nifi/nifi-api/1.9.2/nifi-api-1.9.2.jar!/org/apache/nifi/processor/AbstractProcessor.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="68" selection-start-line="9" selection-start-column="68" selection-end-line="9" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/nifi/nifi-api/1.9.2/nifi-api-1.9.2.jar!/org/apache/nifi/processor/AbstractSessionFactoryProcessor.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="17" column="22" selection-start-line="17" selection-start-column="22" selection-end-line="17" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="22" column="10" selection-start-line="22" selection-start-column="10" selection-end-line="22" selection-end-column="10" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="89" column="39" selection-start-line="89" selection-start-column="39" selection-end-line="89" selection-end-column="39" />
+        <state relative-caret-position="105">
+          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -418,8 +407,76 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/PutMaterializedToKudu.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="243" column="69" lean-forward="true" selection-start-line="243" selection-start-column="69" selection-end-line="243" selection-end-column="69" />
+        <state relative-caret-position="330">
+          <caret line="90" column="54" selection-start-line="90" selection-start-column="46" selection-end-line="90" selection-end-column="54" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/View.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="20" column="56" selection-start-line="20" selection-start-column="56" selection-end-line="20" selection-end-column="56" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="5" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankMerchant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1170">
+          <caret line="85" column="63" selection-start-line="85" selection-start-column="63" selection-end-line="85" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BankCustomer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1185">
+          <caret line="89" column="48" selection-start-line="89" selection-start-column="48" selection-end-line="89" selection-end-column="48" />
+          <folding>
+            <element signature="e#458#459#0" expanded="true" />
+            <element signature="e#510#511#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/BanksTransactions.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="54" selection-start-line="17" selection-start-column="54" selection-end-line="17" selection-end-column="54" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="307">
+          <caret line="98" column="44" lean-forward="true" selection-start-line="98" selection-end-line="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="487">
+          <caret line="126" column="36" lean-forward="true" selection-start-line="126" selection-start-column="36" selection-end-line="126" selection-end-column="36" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
