@@ -27,27 +27,58 @@ public class merchantProfit extends View {
     @Override
     public void handleDeletion(FlowFile flowFile) throws Exception {
 
+
+
+
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
+        int MT_CODE = Integer.parseInt(new_values[1]);
 
-        KuduTable table = kuduClient.openTable(tableName);
+        KuduTable table = kuduClient.openTable(kuduTableName);
         Schema schema = table.getSchema();
-        if ( tableName == "transactions") {
-            int MT_CODE = Integer.parseInt(new_values[0]);
 
-            //get Terminal_ID from Hive
-            Integer merchantId;
-            double transaction_amount;
-            Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
-            String query = "select * from transactions as a inner join terminals as b on a.TERM_ID = b.id inner join " +
-                    " merchants as c on b.merch_id = c.id where MT_CODE = " + MT_CODE;
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            rs.next();
-            merchantId = rs.getInt("merch_id");
-            String merchant_name = rs.getString("name");
-            transaction_amount = rs.getDouble("TRAN_AMOUNT");
+        //get Terminal_ID from Hive
+        int merchantId;
+        int terminalId;
+        String merchantName;
+        double transaction_amount;
+        System.out.println("hussein");
+        Class.forName("org.apache.hive.jdbc.HiveDriver");
+        Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
+
+        if(tableName.equals("transactions")){
+
+        // get terminal id & transactions_amount from transactions
+        String query = "select * from transactions where MT_CODE = " + MT_CODE;
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        System.out.println(rs);
+        rs.next();
+        terminalId = rs.getInt("TERM_ID");
+        transaction_amount = rs.getInt("TRAN_AMOUNT");
+
+        // get merch-id from terminals;
+
+
+        query = "select * from terminals where id = " + terminalId;
+        st = conn.createStatement();
+        rs = st.executeQuery(query);
+        System.out.println(rs);
+        rs.next();
+        merchantId = rs.getInt("merch_id");
+
+
+        //get merchant name from merchants
+
+        query = "select * from merchants where id = " + merchantId;
+        st = conn.createStatement();
+        rs = st.executeQuery(query);
+        System.out.println(rs);
+        rs.next();
+        merchantName = rs.getString("name");
+
+
             int transactionCount = getTransactionCount(kuduClient, tableName, merchantId);
             double total_transaction_amount = getTransactionAmount(kuduClient, tableName, merchantId);
             total_transaction_amount = total_transaction_amount - transaction_amount;
@@ -62,13 +93,13 @@ public class merchantProfit extends View {
             } else if (transactionCount == -1) {
                 // do nothing
             }else{
-                    updateRow(kuduClient, merchantId, merchant_name, transaction_amount + total_transaction_amount, transactionCount + 1);
+                    updateRow(kuduClient, merchantId, merchantName, transaction_amount + total_transaction_amount, transactionCount + 1);
                 }
 
-        }else {
+        } else {
             // this means the delete is in merchants
 
-            int merch_id = Integer.parseInt(new_values[0]);
+            int merch_id = Integer.parseInt(new_values[1]);
             KuduSession session = kuduClient.newSession();
             Delete delete = table.newDelete();
             delete.getRow().addInt("ID", merch_id);

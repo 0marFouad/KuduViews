@@ -49,8 +49,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="151" lean-forward="true" selection-start-line="151" selection-end-line="151" />
+            <state relative-caret-position="137">
+              <caret line="112" column="69" lean-forward="true" selection-start-line="112" selection-start-column="69" selection-end-line="112" selection-end-column="69" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -61,8 +61,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
-              <caret line="98" column="35" lean-forward="true" selection-start-line="98" selection-end-line="99" />
+            <state relative-caret-position="-674">
+              <caret line="84" lean-forward="true" selection-start-line="84" selection-end-line="84" />
             </state>
           </provider>
         </entry>
@@ -295,7 +295,14 @@
       <option name="project" value="LOCAL" />
       <updated>1568195524191</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="fix handle insertions in merchantprofit">
+      <created>1568716935931</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1568716935932</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -363,7 +370,8 @@
     <MESSAGE value="merchant profit complete without testing" />
     <MESSAGE value="bank transactions complete without testing" />
     <MESSAGE value="make id string instead int64" />
-    <option name="LAST_COMMIT_MESSAGE" value="make id string instead int64" />
+    <MESSAGE value="fix handle insertions in merchantprofit" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix handle insertions in merchantprofit" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/.idea/modules.xml">
@@ -465,15 +473,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/TransTerm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="307">
-          <caret line="98" column="44" lean-forward="true" selection-start-line="98" selection-end-line="99" />
+        <state relative-caret-position="-674">
+          <caret line="84" lean-forward="true" selection-start-line="84" selection-end-line="84" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nifi-demo-processors/src/main/java/scc/processors/demo/merchantProfit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="487">
-          <caret line="126" column="36" lean-forward="true" selection-start-line="126" selection-start-column="36" selection-end-line="126" selection-end-column="36" />
+        <state relative-caret-position="137">
+          <caret line="112" column="69" lean-forward="true" selection-start-line="112" selection-start-column="69" selection-end-line="112" selection-end-column="69" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
