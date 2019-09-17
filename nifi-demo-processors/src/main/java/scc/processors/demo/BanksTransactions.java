@@ -11,7 +11,7 @@ public class BanksTransactions extends View{
 
 
 
-    private final static String kuduTableName = "views::bank-transaction";
+    private final static String kuduTableName = "BankTransaction";
 
     private  int total_transaction_amount =0  ;
     private String ID ;
@@ -28,7 +28,7 @@ public class BanksTransactions extends View{
         String tableName = flowFile.getAttribute("table_name");
         if(tableName == "transactions"){
             //set KuduTable
-            KuduTable table = kuduClient.openTable(tableName);
+            KuduTable table = kuduClient.openTable(kuduTableName);
             Schema schema = table.getSchema();
 
             //get Terminal_ID from Hive
@@ -40,18 +40,18 @@ public class BanksTransactions extends View{
             Integer destBankId=Integer.parseInt(values[5]);;
             Integer trans_amount=Integer.parseInt(values[1]);;
             //find entry of same terminal_id in Kudu and store Number of transactions
-            int transactionCount = getTransactionCount(kuduClient,tableName,sourceBankId,destBankId);
+            int transactionCount = getTransactionCount(kuduClient,kuduTableName,sourceBankId,destBankId);
             //Create new statement with inserting in kudu Number of transactions + 1
             if(transactionCount == 0){
-                insertRow(kuduClient,sourceBankId,destBankId,transactionCount,trans_amount+total_transaction_amount);
+                insertRow(kuduClient,sourceBankId,destBankId,1,trans_amount+total_transaction_amount);
             }else{
-                updateRow(kuduClient,sourceBankId,destBankId,transactionCount,trans_amount+total_transaction_amount);
+                updateRow(kuduClient,sourceBankId,destBankId,transactionCount+1,trans_amount+total_transaction_amount);
             }
 
         }
     }
 
-    private void updateRow(KuduClient kuduClient, Integer sourceBankId, Integer destBankId, int transactionCount, int i) throws Exception {
+    private void updateRow(KuduClient kuduClient, Integer sourceBankId, Integer destBankId, int transactionCount, double i) throws Exception {
 
         KuduTable table = kuduClient.openTable(kuduTableName);
         KuduSession session = kuduClient.newSession();
@@ -122,15 +122,20 @@ public class BanksTransactions extends View{
             String[] values = flowFile.getAttribute("new_values").split(",");
             Integer sourceBankId=Integer.parseInt(values[4]);
             Integer destBankId=Integer.parseInt(values[5]);
+            transaction_amount = Integer.parseInt(values[1]);
             int transaction_count=getTransactionCount(kuduClient,tableName,sourceBankId,destBankId);
-            KuduTable table = kuduClient.openTable(tableName);
-            if(transaction_count!=0){
+            KuduTable table = kuduClient.openTable(kuduTableName);
+            if(transaction_count<=1){
 
                 KuduSession session = kuduClient.newSession();
                 Delete delete = table.newDelete();
                 delete.getRow().addString("ID", ID);
                 session.apply(delete);
                 session.close();
+            }else {
+                double temp =  total_transaction_amount-transaction_amount;
+                updateRow(kuduClient,sourceBankId,destBankId,transaction_count-1,temp);
+
             }
         } else {
 
