@@ -1,8 +1,10 @@
 package scc.processors.demo;
 
+import com.mysql.cj.xdevapi.DatabaseObject;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.*;
 import org.apache.nifi.flowfile.FlowFile;
+import org.apache.nifi.remote.io.socket.ssl.SSLSocketChannelOutputStream;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -33,7 +35,9 @@ public class merchantProfit extends View {
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
-        int MT_CODE = Integer.parseInt(new_values[1]);
+        String temp = new_values[0].substring(1,new_values[0].length());
+
+        int MT_CODE = Integer.parseInt(temp);
 
         KuduTable table = kuduClient.openTable(kuduTableName);
         Schema schema = table.getSchema();
@@ -42,7 +46,7 @@ public class merchantProfit extends View {
         int merchantId;
         int terminalId;
         String merchantName;
-        double transaction_amount;
+        int transaction_amount;
         System.out.println("hussein");
         Class.forName("org.apache.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
@@ -55,8 +59,8 @@ public class merchantProfit extends View {
         ResultSet rs = st.executeQuery(query);
         System.out.println(rs);
         rs.next();
-        terminalId = rs.getInt("TERM_ID");
-        transaction_amount = rs.getInt("TRAN_AMOUNT");
+        terminalId = rs.getInt("term_id");
+        transaction_amount = rs.getInt("tran_amount");
 
         // get merch-id from terminals;
 
@@ -80,7 +84,7 @@ public class merchantProfit extends View {
 
 
             int transactionCount = getTransactionCount(kuduClient, kuduTableName, merchantId);
-            double total_transaction_amount = getTransactionAmount(kuduClient, kuduTableName, merchantId);
+            Double total_transaction_amount = getTransactionAmount(kuduClient, kuduTableName, merchantId);
             total_transaction_amount = total_transaction_amount - transaction_amount;
             transactionCount = transactionCount - 1;
             if (transactionCount == 0) {
@@ -115,7 +119,9 @@ public class merchantProfit extends View {
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
-        int MT_CODE = Integer.parseInt(new_values[1]);
+        String temp = new_values[0].substring(1,new_values[0].length());
+
+        int MT_CODE = Integer.parseInt(temp);
 
         KuduTable table = kuduClient.openTable(kuduTableName);
         Schema schema = table.getSchema();
@@ -125,7 +131,6 @@ public class merchantProfit extends View {
         int terminalId;
         String merchantName;
         double transaction_amount;
-        System.out.println("hussein");
         Class.forName("org.apache.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
 
@@ -137,8 +142,11 @@ public class merchantProfit extends View {
         ResultSet rs = st.executeQuery(query);
         System.out.println(rs);
         rs.next();
-        terminalId = rs.getInt("TERM_ID");
-        transaction_amount = rs.getInt("TRAN_AMOUNT");
+        System.out.println("opaaa1");
+        terminalId = rs.getInt("term_id");
+        System.out.println("opaaa2");
+        transaction_amount = rs.getInt("tran_amount");
+        System.out.println("opaaa3");
 
         // get merch-id from terminals;
 
@@ -148,7 +156,9 @@ public class merchantProfit extends View {
         rs = st.executeQuery(query);
         System.out.println(rs);
         rs.next();
+        System.out.println("opaaa4");
         merchantId = rs.getInt("merch_id");
+        System.out.println("opaaa5");
 
 
         //get merchant name from merchants
@@ -186,7 +196,7 @@ public class merchantProfit extends View {
 
 
 
-    private int getTransactionAmount(KuduClient client, String tableName, Integer merchant_id)  throws KuduException {
+    private Double getTransactionAmount(KuduClient client, String tableName, Integer merchant_id)  throws KuduException {
 
         KuduTable table = client.openTable(tableName);
 
@@ -198,10 +208,10 @@ public class merchantProfit extends View {
             while (results.hasNext()) {
                 RowResult result = results.next();
                 if(result.getInt(1) == merchant_id)
-                    return result.getInt(3);
+                    return result.getDouble(4);
             }
         }
-        return 0;
+        return 0.0;
     }
     private int getTransactionCount(KuduClient client, String tableName, int merchant_id) throws KuduException {
         KuduTable table = client.openTable(tableName);
@@ -214,7 +224,8 @@ public class merchantProfit extends View {
             while (results.hasNext()) {
                 RowResult result = results.next();
                 if(result.getInt(1) == merchant_id){
-                    return result.getInt(4);}
+                    id = result.getString(0);
+                    return result.getInt(3);}
             }
         }
         return 0;
@@ -227,7 +238,7 @@ public class merchantProfit extends View {
         Insert insert = table.newInsert();
         Date date= new Date();
         Long time = date.getTime();
-        insert.getRow().addString("ID",String.valueOf(time));
+        insert.getRow().addString("TIME",String.valueOf(time));
         insert.getRow().addInt("MERCH_ID", merchant_id);
         insert.getRow().addString("MERCH_NAME", merchant_name);
         insert.getRow().addInt("TRANSCOUNT", 1);
@@ -237,13 +248,15 @@ public class merchantProfit extends View {
     }
     private void updateRow(KuduClient client,Integer merchantId,String merchant_name  ,double transaction_amount , Integer transaction_count) throws KuduException {
 
+        System.out.println("ahmed heshahm " +  id +" "+transaction_amount +" "+ merchantId +" "+transaction_count +" "+ merchant_name);
+        System.out.println("adsakdsahdksahdkhsdkhdkshadkhs");
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
-        update.getRow().addString("ID",id);
+        update.getRow().addString("TIME",id);
         update.getRow().addInt("MERCH_ID", merchantId);
-        update.getRow().addInt("TRANS-NUM", transaction_count);
         update.getRow().addString("MERCH_NAME", merchant_name);
+        update.getRow().addInt("TRANSCOUNT", transaction_count);
         update.getRow().addDouble("TRANS_AMT", transaction_amount);
         session.apply(update);
         session.close();
@@ -259,8 +272,8 @@ public class merchantProfit extends View {
         String[] new_values = flowFile.getAttribute("new_values").split(",");
         String[] old_values = flowFile.getAttribute("old_values").split(",");
 
-
-            int MT_CODE = Integer.parseInt(new_values[1]);
+           String temp = new_values[0].substring(1,new_values[0].length());
+            int MT_CODE = Integer.parseInt(temp);
 
             KuduTable table = kuduClient.openTable(kuduTableName);
             Schema schema = table.getSchema();
@@ -282,8 +295,8 @@ public class merchantProfit extends View {
             ResultSet rs = st.executeQuery(query);
             System.out.println(rs);
             rs.next();
-            terminalId = rs.getInt("TERM_ID");
-            transaction_amount = rs.getInt("TRAN_AMOUNT");
+            terminalId = rs.getInt("term_id");
+            transaction_amount = rs.getDouble("tran_amount");
 
             // get merch-id from terminals;
 

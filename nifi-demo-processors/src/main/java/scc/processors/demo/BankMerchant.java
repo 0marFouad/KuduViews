@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class BankMerchant extends View {
 
-    private final static String kuduTableName = "views::bank-merchant";
+    private final static String kuduTableName = "BankMerchant";
 
     BankMerchant(KuduClient kuduClient, String hiveConnectionURL){
         super(kuduClient, hiveConnectionURL);

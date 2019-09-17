@@ -12,7 +12,7 @@ import java.sql.Statement;
 
 public class BankCustomer extends View {
 
-    private final static String kuduTableName = "views::bank-customer";
+    private final static String kuduTableName = "BankCustomers";
 
     BankCustomer(KuduClient kuduClient, String hiveConnectionURL){
         super(kuduClient, hiveConnectionURL);
@@ -27,7 +27,8 @@ public class BankCustomer extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt("BANK_ID") == bank_id && result.getString("REG_DATE").equals(reg_date)){
+                if(result.getInt("BANK_ID") == bank_id && result.getString("TIME").equals(reg_date)){
+                    System.out.println("entered inner while");
                     Update update = table.newUpdate();
                     update.getRow().addString("TIME",reg_date);
                     update.getRow().addInt("BANK_ID", bank_id);
@@ -38,19 +39,19 @@ public class BankCustomer extends View {
                     return;
                 }
             }
-            Insert insert = table.newInsert();
-            insert.getRow().addString("TIME", reg_date);
-            insert.getRow().addInt("BANK_ID", bank_id);
-
-            Date date= new Date();
-            Long time = date.getTime();
-
-            insert.getRow().addString("ID", time.toString());
-            insert.getRow().addInt("CUSTOMERS_NUM", 1);
-            session.apply(insert);
-            session.close();
 
         }
+        Insert insert = table.newInsert();
+        insert.getRow().addString("TIME", reg_date);
+        insert.getRow().addInt("BANK_ID", bank_id);
+
+        Date date= new Date();
+        Long time = date.getTime();
+
+        insert.getRow().addString("ID", time.toString());
+        insert.getRow().addInt("CUSTOMERS_NUM", 1);
+        session.apply(insert);
+        session.close();
 
     }
     private void deleteRow(int bank_id, String reg_date) throws KuduException {
@@ -61,10 +62,17 @@ public class BankCustomer extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt("BANK_ID") == bank_id && result.getString("REG_DATE").equals(reg_date)){
-                    Update update = table.newUpdate();
-                    update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") - 1);
-                    session.apply(update);
+                if(result.getInt("BANK_ID") == bank_id && result.getString("TIME").equals(reg_date)){
+                    if(result.getInt("CUSTOMERS_NUM") == 1){
+                        Delete delete = table.newDelete();
+                        delete.getRow().addString("ID", result.getString("ID"));
+                        session.apply(delete);
+                    } else {
+                        Update update = table.newUpdate();
+                        update.getRow().addString("ID", result.getString("ID"));
+                        update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") - 1);
+                        session.apply(update);
+                    }
                     session.close();
                 }
             }
@@ -75,10 +83,10 @@ public class BankCustomer extends View {
     public void handleInsertion(FlowFile flowFile) throws Exception {
         String tableName = flowFile.getAttribute("table_name");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
-        int bank_id = Integer.parseInt(new_values[3]);
+        int bank_id = Integer.parseInt(new_values[3].substring(0, new_values[3].length() - 1));
         String reg_date = new_values[1];
-        SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String currentYear = Integer.toString(formatter.parse(reg_date).getYear());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentYear = Integer.toString(formatter.parse(reg_date.substring(1, reg_date.length() - 1)).getYear() + 1900);
         if(tableName.toLowerCase().equals("cards")){
             insertRow(bank_id, currentYear);
         }
@@ -88,10 +96,10 @@ public class BankCustomer extends View {
     public void handleDeletion(FlowFile flowFile) throws Exception {
         String tableName = flowFile.getAttribute("table_name");
         String[] values = flowFile.getAttribute("new_values").split(",");
-        int bank_id = Integer.parseInt(values[3]);
+        int bank_id = Integer.parseInt(values[3].substring(0,values[3].length() - 1));
         String reg_date = values[1];
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String currentYear = Integer.toString(formatter.parse(reg_date).getYear());
+        String currentYear = Integer.toString(formatter.parse(reg_date.substring(1, reg_date.length() - 1)).getYear() + 1900);
         if(tableName.toLowerCase().equals("cards")){
             deleteRow(bank_id, currentYear);
         }
