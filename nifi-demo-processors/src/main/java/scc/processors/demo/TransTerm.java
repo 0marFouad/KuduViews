@@ -11,7 +11,7 @@ import java.util.Date;
 
 
 public class TransTerm extends View {
-    private final static String kuduTableName = "TransactionTerminal";
+    private final static String kuduTableName = "transactionterminal";
 
     TransTerm(KuduClient kuduClient, String hiveConnectionURL) {
         super(kuduClient, hiveConnectionURL);

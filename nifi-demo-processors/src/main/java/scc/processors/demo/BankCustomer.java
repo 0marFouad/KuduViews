@@ -12,7 +12,7 @@ import java.sql.Statement;
 
 public class BankCustomer extends View {
 
-    private final static String kuduTableName = "BankCustomers";
+    private final static String kuduTableName = "bankcustomers";
 
     BankCustomer(KuduClient kuduClient, String hiveConnectionURL){
         super(kuduClient, hiveConnectionURL);

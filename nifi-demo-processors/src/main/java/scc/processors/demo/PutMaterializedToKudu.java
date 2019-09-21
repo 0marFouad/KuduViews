@@ -245,13 +245,12 @@ public class PutMaterializedToKudu extends AbstractProcessor {
             if(tableName.equals("transactions")){
                 this.getLogger().debug(tableName);
                 this.getLogger().debug(flowFile.getAttribute("query_type"));
-
-                tt.execute(flowFile.getAttribute("query_type"),flowFile);
-                offon.execute(flowFile.getAttribute("query_type"),flowFile);
-                mp.execute(flowFile.getAttribute("query_type"),flowFile);
-              /*   bm.execute(flowFile.getAttribute("query_type"),flowFile);
                 bt.execute(flowFile.getAttribute("query_type"),flowFile);
-                cm.execute(flowFile.getAttribute("query_type"),flowFile);
+                //tt.execute(flowFile.getAttribute("query_type"),flowFile);
+                //offon.execute(flowFile.getAttribute("query_type"),flowFile);
+                //mp.execute(flowFile.getAttribute("query_type"),flowFile);
+               // bm.execute(flowFile.getAttribute("query_type"),flowFile);
+              /* cm.execute(flowFile.getAttribute("query_type"),flowFile);
                 cr.execute(flowFile.getAttribute("query_type"),flowFile);*/
             }
 

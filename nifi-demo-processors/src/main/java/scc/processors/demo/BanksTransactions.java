@@ -11,7 +11,7 @@ public class BanksTransactions extends View{
 
 
 
-    private final static String kuduTableName = "BankTransaction";
+    private final static String kuduTableName = "banktransactions";
 
     private  int total_transaction_amount =0  ;
     private String ID ;
@@ -26,9 +26,15 @@ public class BanksTransactions extends View{
 
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
-        if(tableName == "transactions"){
+        System.out.println(tableName);
+
+        if(tableName.equals("transactions")){
             //set KuduTable
+
+
             KuduTable table = kuduClient.openTable(kuduTableName);
+            System.out.println("ahmed hesham 0 ");
+
             Schema schema = table.getSchema();
 
             //get Terminal_ID from Hive
@@ -36,13 +42,18 @@ public class BanksTransactions extends View{
                 Integer MT_CODE;
             double transaction_amount;
             String[] values = flowFile.getAttribute("new_values").split(",");
-            Integer sourceBankId=Integer.parseInt(values[4]);;
-            Integer destBankId=Integer.parseInt(values[5]);;
-            Integer trans_amount=Integer.parseInt(values[1]);;
+
+            Integer sourceBankId=Integer.parseInt(values[4]);
+
+            Integer destBankId=Integer.parseInt(values[5]);
+
+            Integer trans_amount=Integer.parseInt(values[1]);
             //find entry of same terminal_id in Kudu and store Number of transactions
             int transactionCount = getTransactionCount(kuduClient,kuduTableName,sourceBankId,destBankId);
             //Create new statement with inserting in kudu Number of transactions + 1
             if(transactionCount == 0){
+
+                System.out.println(sourceBankId);
                 insertRow(kuduClient,sourceBankId,destBankId,1,trans_amount+total_transaction_amount);
             }else{
                 updateRow(kuduClient,sourceBankId,destBankId,transactionCount+1,trans_amount+total_transaction_amount);
@@ -59,8 +70,8 @@ public class BanksTransactions extends View{
         update.getRow().addString("ID", ID);
         update.getRow().addInt("FROMBANK", sourceBankId);
         update.getRow().addInt("TOBANK", destBankId);
-        update.getRow().addInt("TRANS-NUM", transactionCount);
-        update.getRow().addDouble("TOTAL-AMT-TRANS", i);
+        update.getRow().addInt("TRANSCOUNT", transactionCount);
+        update.getRow().addDouble("TRANSAMT", i);
         session.apply(update);
         session.close();
 
@@ -78,10 +89,10 @@ public class BanksTransactions extends View{
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt(0) == sourceBankId && result.getInt(1)==destBankId ){
-                    total_transaction_amount = result.getInt(3);
-                    ID = result.getString(0);
-                    return result.getInt(2);
+                if(result.getInt("FROMBANK") == sourceBankId && result.getInt("TOBANK")==destBankId ){
+                    total_transaction_amount = result.getInt("TRANSCOUNT");
+                    ID = result.getString("ID");
+                    return result.getInt("TRANSCOUNT");
                 }
             }
         }
@@ -98,11 +109,12 @@ public class BanksTransactions extends View{
 
         Insert insert = table.newInsert();
 
+
         insert.getRow().addString("ID",String.valueOf(time));
         insert.getRow().addInt("FROMBANK", sourceBankId);
         insert.getRow().addInt("TOBANK", destBankId);
-        insert.getRow().addInt("TRANS-NUM", transactionCount);
-        insert.getRow().addDouble("TOTAL-AMT-TRANS", trans_amount);
+        insert.getRow().addInt("TRANSCOUNT", transactionCount);
+        insert.getRow().addDouble("TRANSAMT", trans_amount);
         session.apply(insert);
         session.close();
 
@@ -114,7 +126,7 @@ public class BanksTransactions extends View{
 
         String databaseName = flowFile.getAttribute("database_name");
         String tableName = flowFile.getAttribute("table_name");
-        if(tableName == "transactions"){
+        if(tableName.equals("transactions")){
 
             //get Terminal_ID from Hive
             Integer MT_CODE;
@@ -123,7 +135,7 @@ public class BanksTransactions extends View{
             Integer sourceBankId=Integer.parseInt(values[4]);
             Integer destBankId=Integer.parseInt(values[5]);
             transaction_amount = Integer.parseInt(values[1]);
-            int transaction_count=getTransactionCount(kuduClient,tableName,sourceBankId,destBankId);
+            int transaction_count=getTransactionCount(kuduClient,kuduTableName,sourceBankId,destBankId);
             KuduTable table = kuduClient.openTable(kuduTableName);
             if(transaction_count<=1){
 

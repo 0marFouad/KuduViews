@@ -18,7 +18,7 @@ import static scc.processors.demo.merchantProfit.*;
 public class merchantProfit extends View {
 
 
-    private final static String kuduTableName = "MerchantProfit";
+    private final static String kuduTableName = "merchantprofit";
 
     private  String id;
     merchantProfit(KuduClient kuduClient, String hiveConnectionURL) {
@@ -50,24 +50,23 @@ public class merchantProfit extends View {
         System.out.println("hussein");
         Class.forName("org.apache.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
+        System.out.println(new_values[0]);
 
         if(tableName.equals("transactions")){
+            System.out.println("is the error here 0 ");
 
         // get terminal id & transactions_amount from transactions
-        String query = "select * from transactions where MT_CODE = " + MT_CODE;
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery(query);
-        System.out.println(rs);
-        rs.next();
-        terminalId = rs.getInt("term_id");
-        transaction_amount = rs.getInt("tran_amount");
+
+            terminalId = Integer.parseInt(new_values[2]);
+            transaction_amount = Integer.parseInt(new_values[1]);
 
         // get merch-id from terminals;
 
+            System.out.println("is the error here 1 ");
 
-        query = "select * from terminals where id = " + terminalId;
-        st = conn.createStatement();
-        rs = st.executeQuery(query);
+            String query = "select * from terminals where id = " + terminalId;
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(query);
         System.out.println(rs);
         rs.next();
         merchantId = rs.getInt("merch_id");
@@ -83,8 +82,12 @@ public class merchantProfit extends View {
         merchantName = rs.getString("name");
 
 
-            int transactionCount = getTransactionCount(kuduClient, kuduTableName, merchantId);
+             int transactionCount = getTransactionCount(kuduClient, kuduTableName, merchantId);
+            System.out.println("is the error here2 ");
+
             Double total_transaction_amount = getTransactionAmount(kuduClient, kuduTableName, merchantId);
+            System.out.println("is the error here 3");
+
             total_transaction_amount = total_transaction_amount - transaction_amount;
             transactionCount = transactionCount - 1;
             if (transactionCount == 0) {
@@ -97,7 +100,7 @@ public class merchantProfit extends View {
             } else if (transactionCount == -1) {
                 // do nothing
             }else{
-                    updateRow(kuduClient, merchantId, merchantName, transaction_amount + total_transaction_amount, transactionCount + 1);
+                    updateRow(kuduClient, merchantId, merchantName, transaction_amount + total_transaction_amount, transactionCount );
                 }
 
         } else {
@@ -208,7 +211,7 @@ public class merchantProfit extends View {
             while (results.hasNext()) {
                 RowResult result = results.next();
                 if(result.getInt(1) == merchant_id)
-                    return result.getDouble(4);
+                    return result.getDouble("TRANS_AMT");
             }
         }
         return 0.0;
@@ -225,7 +228,7 @@ public class merchantProfit extends View {
                 RowResult result = results.next();
                 if(result.getInt(1) == merchant_id){
                     id = result.getString(0);
-                    return result.getInt(3);}
+                    return result.getInt("TRANSCOUNT");}
             }
         }
         return 0;
@@ -238,7 +241,7 @@ public class merchantProfit extends View {
         Insert insert = table.newInsert();
         Date date= new Date();
         Long time = date.getTime();
-        insert.getRow().addString("TIME",String.valueOf(time));
+        insert.getRow().addString("ID",String.valueOf(time));
         insert.getRow().addInt("MERCH_ID", merchant_id);
         insert.getRow().addString("MERCH_NAME", merchant_name);
         insert.getRow().addInt("TRANSCOUNT", 1);
@@ -253,7 +256,7 @@ public class merchantProfit extends View {
         KuduTable table = client.openTable(kuduTableName);
         KuduSession session = client.newSession();
         Update update = table.newUpdate();
-        update.getRow().addString("TIME",id);
+        update.getRow().addString("ID",id);
         update.getRow().addInt("MERCH_ID", merchantId);
         update.getRow().addString("MERCH_NAME", merchant_name);
         update.getRow().addInt("TRANSCOUNT", transaction_count);
