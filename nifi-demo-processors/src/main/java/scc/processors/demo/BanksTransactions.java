@@ -33,7 +33,7 @@ public class BanksTransactions extends View{
 
 
             KuduTable table = kuduClient.openTable(kuduTableName);
-            System.out.println("ahmed hesham 0 ");
+//            System.out.println("ahmed hesham 0 ");
 
             Schema schema = table.getSchema();
 
@@ -54,7 +54,7 @@ public class BanksTransactions extends View{
             if(transactionCount == 0){
 
                 System.out.println(sourceBankId);
-                insertRow(kuduClient,sourceBankId,destBankId,1,trans_amount+total_transaction_amount);
+                insertRow(kuduClient,sourceBankId,destBankId,1,trans_amount);
             }else{
                 updateRow(kuduClient,sourceBankId,destBankId,transactionCount+1,trans_amount+total_transaction_amount);
             }
@@ -90,7 +90,7 @@ public class BanksTransactions extends View{
             while (results.hasNext()) {
                 RowResult result = results.next();
                 if(result.getInt("FROMBANK") == sourceBankId && result.getInt("TOBANK")==destBankId ){
-                    total_transaction_amount = result.getInt("TRANSCOUNT");
+                    total_transaction_amount = (int)result.getDouble("TRANSAMT");
                     ID = result.getString("ID");
                     return result.getInt("TRANSCOUNT");
                 }

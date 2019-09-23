@@ -246,12 +246,12 @@ public class PutMaterializedToKudu extends AbstractProcessor {
                 this.getLogger().debug(tableName);
                 this.getLogger().debug(flowFile.getAttribute("query_type"));
                 bt.execute(flowFile.getAttribute("query_type"),flowFile);
-                //tt.execute(flowFile.getAttribute("query_type"),flowFile);
-                //offon.execute(flowFile.getAttribute("query_type"),flowFile);
-                //mp.execute(flowFile.getAttribute("query_type"),flowFile);
-               // bm.execute(flowFile.getAttribute("query_type"),flowFile);
-              /* cm.execute(flowFile.getAttribute("query_type"),flowFile);
-                cr.execute(flowFile.getAttribute("query_type"),flowFile);*/
+                tt.execute(flowFile.getAttribute("query_type"),flowFile);
+                offon.execute(flowFile.getAttribute("query_type"),flowFile);
+                mp.execute(flowFile.getAttribute("query_type"),flowFile);
+                bm.execute(flowFile.getAttribute("query_type"),flowFile);
+                //cm.execute(flowFile.getAttribute("query_type"),flowFile);
+                //cr.execute(flowFile.getAttribute("query_type"),flowFile);
             }
 
 
@@ -260,6 +260,7 @@ public class PutMaterializedToKudu extends AbstractProcessor {
                 cr.execute(flowFile.getAttribute("query_type"),flowFile);
             }
             if(tableName.equals("cards")){
+                System.out.println("inserted in cards");
                 bc.execute(flowFile.getAttribute("query_type"),flowFile);
             }
 

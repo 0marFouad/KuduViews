@@ -27,11 +27,12 @@ public class BankCustomer extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt("BANK_ID") == bank_id && result.getString("TIME").equals(reg_date)){
+                System.out.println("before condition");
+                if(result.getInt(1) == bank_id && result.getString("TIME").equals(reg_date)){
                     System.out.println("entered inner while");
                     Update update = table.newUpdate();
                     update.getRow().addString("TIME",reg_date);
-                    update.getRow().addInt("BANK_ID", bank_id);
+                    update.getRow().addInt(1, bank_id);
                     update.getRow().addString("ID", result.getString("ID"));
                     update.getRow().addInt("CUSTOMERS_NUM", result.getInt("CUSTOMERS_NUM") + 1);
                     session.apply(update);
@@ -41,14 +42,15 @@ public class BankCustomer extends View {
             }
 
         }
+        System.out.println("outside while");
         Insert insert = table.newInsert();
-        insert.getRow().addString("TIME", reg_date);
-        insert.getRow().addInt("BANK_ID", bank_id);
 
         Date date= new Date();
         Long time = date.getTime();
 
         insert.getRow().addString("ID", time.toString());
+        insert.getRow().addInt(1, bank_id);
+        insert.getRow().addString("TIME", reg_date);
         insert.getRow().addInt("CUSTOMERS_NUM", 1);
         session.apply(insert);
         session.close();
@@ -62,7 +64,7 @@ public class BankCustomer extends View {
             RowResultIterator results = scanner.nextRows();
             while (results.hasNext()) {
                 RowResult result = results.next();
-                if(result.getInt("BANK_ID") == bank_id && result.getString("TIME").equals(reg_date)){
+                if(result.getInt(1) == bank_id && result.getString("TIME").equals(reg_date)){
                     if(result.getInt("CUSTOMERS_NUM") == 1){
                         Delete delete = table.newDelete();
                         delete.getRow().addString("ID", result.getString("ID"));
@@ -81,6 +83,7 @@ public class BankCustomer extends View {
 
     @Override
     public void handleInsertion(FlowFile flowFile) throws Exception {
+        System.out.println("entered handle");
         String tableName = flowFile.getAttribute("table_name");
         String[] new_values = flowFile.getAttribute("new_values").split(",");
         int bank_id = Integer.parseInt(new_values[3].substring(0, new_values[3].length() - 1));
@@ -88,6 +91,7 @@ public class BankCustomer extends View {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentYear = Integer.toString(formatter.parse(reg_date.substring(1, reg_date.length() - 1)).getYear() + 1900);
         if(tableName.toLowerCase().equals("cards")){
+            System.out.println("inserting in kudu");
             insertRow(bank_id, currentYear);
         }
     }

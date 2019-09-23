@@ -87,6 +87,7 @@ public class BankMerchant extends View {
         Class.forName("org.apache.hive.jdbc.HiveDriver");
         Connection conn = DriverManager.getConnection(hiveConnectionURL + "/" + databaseName, "hdfs", "");
         Statement st = conn.createStatement();
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         String tableName = flowFile.getAttribute("table_name");
